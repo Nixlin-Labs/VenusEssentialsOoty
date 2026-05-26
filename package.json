@@ -1,0 +1,20 @@
+{
+  "name": "venus-essentials-ooty-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "admin-app",
+    "customer-app",
+    "backend"
+  ],
+  "scripts": {
+    "dev:admin": "npm run dev --workspace=admin-app",
+    "dev:customer": "npm run dev --workspace=customer-app",
+    "dev:backend": "npm run dev --workspace=backend",
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:customer\" \"npm run dev:admin\"",
+    "build": "npm run build --workspaces --if-present"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
