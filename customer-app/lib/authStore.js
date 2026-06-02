@@ -4,6 +4,32 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import api from './api';
 
+const mapBackendAddress = (addr) => ({
+  id: addr._id || addr.id,
+  label: addr.type ? (addr.type.charAt(0).toUpperCase() + addr.type.slice(1)) : 'Home',
+  fullName: addr.fullName,
+  mobile: addr.phone,
+  line1: addr.addressLine1,
+  line2: addr.addressLine2 || '',
+  city: addr.city,
+  state: addr.state,
+  pincode: addr.pincode,
+  country: 'India',
+  isDefault: addr.isDefault
+});
+
+const mapFrontendAddress = (addr) => ({
+  fullName: addr.fullName,
+  phone: addr.mobile,
+  addressLine1: addr.line1,
+  addressLine2: addr.line2 || '',
+  city: addr.city,
+  state: addr.state,
+  pincode: addr.pincode,
+  type: ['home', 'office', 'other'].includes(addr.label?.toLowerCase()) ? addr.label.toLowerCase() : 'home',
+  isDefault: addr.isDefault || false
+});
+
 export const useAuthStore = create()(
   persist(
     (set, get) => ({
@@ -15,7 +41,9 @@ export const useAuthStore = create()(
       selectedAddressId: null,
       orders: [],
       isLoading: false,
+      hasHydrated: false,
 
+      setHasHydrated: (val) => set({ hasHydrated: val }),
       openAuthModal: (mode = 'login') => set({ authModalOpen: true, authMode: mode }),
       closeAuthModal: () => set({ authModalOpen: false }),
       setAuthMode: (mode) => set({ authMode: mode }),
@@ -28,6 +56,8 @@ export const useAuthStore = create()(
           if (typeof window !== 'undefined') {
             localStorage.setItem('venus_access_token', accessToken);
             localStorage.setItem('venus_refresh_token', refreshToken);
+            document.cookie = `venus_access_token=${accessToken}; path=/; max-age=604800; SameSite=Lax; Secure`;
+            document.cookie = `venus_refresh_token=${refreshToken}; path=/; max-age=604800; SameSite=Lax; Secure`;
           }
           set({
             isAuthenticated: true,
@@ -36,6 +66,7 @@ export const useAuthStore = create()(
             authMode: 'login',
             isLoading: false,
           });
+          await get().fetchAddresses();
           return true;
         } catch (error) {
           set({ isLoading: false });
@@ -64,6 +95,8 @@ export const useAuthStore = create()(
         if (typeof window !== 'undefined') {
           localStorage.removeItem('venus_access_token');
           localStorage.removeItem('venus_refresh_token');
+          document.cookie = "venus_access_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+          document.cookie = "venus_refresh_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
         }
         set({
           isAuthenticated: false,
@@ -84,29 +117,66 @@ export const useAuthStore = create()(
         }
       },
 
-      // Fallbacks for now, should ideally be migrated to backend APIs if endpoints exist
-      addAddress: (address) =>
-        set((state) => {
-          const id = `addr-${Date.now()}`;
-          return {
-            addresses: [...state.addresses, { ...address, id }],
-            selectedAddressId: id,
-          };
-        }),
-      updateAddress: (id, updates) =>
-        set((state) => ({
-          addresses: state.addresses.map((a) => (a.id === id ? { ...a, ...updates } : a)),
-        })),
-      deleteAddress: (id) =>
-        set((state) => {
-          const remaining = state.addresses.filter((a) => a.id !== id);
-          const fallback = remaining[0]?.id || '';
-          return {
-            addresses: remaining,
-            selectedAddressId:
-              state.selectedAddressId === id ? fallback : state.selectedAddressId,
-          };
-        }),
+      fetchAddresses: async () => {
+        const state = get();
+        if (!state.isAuthenticated) return;
+        try {
+          const { data } = await api.get('/addresses');
+          const addresses = (data.data || []).map(mapBackendAddress);
+          const defaultAddr = addresses.find(a => a.isDefault) || addresses[0];
+          set({
+            addresses,
+            selectedAddressId: state.selectedAddressId || defaultAddr?.id || null
+          });
+        } catch (error) {
+          console.error("Failed to fetch addresses:", error);
+        }
+      },
+
+      addAddress: async (address) => {
+        set({ isLoading: true });
+        try {
+          const payload = mapFrontendAddress(address);
+          const { data } = await api.post('/addresses', payload);
+          set({ isLoading: false });
+          await get().fetchAddresses();
+          if (data.data?._id) {
+            set({ selectedAddressId: data.data._id });
+          }
+          return { success: true };
+        } catch (error) {
+          set({ isLoading: false });
+          return { success: false };
+        }
+      },
+
+      updateAddress: async (id, updates) => {
+        set({ isLoading: true });
+        try {
+          const payload = mapFrontendAddress(updates);
+          await api.put(`/addresses/${id}`, payload);
+          set({ isLoading: false });
+          await get().fetchAddresses();
+          return { success: true };
+        } catch (error) {
+          set({ isLoading: false });
+          return { success: false };
+        }
+      },
+
+      deleteAddress: async (id) => {
+        set({ isLoading: true });
+        try {
+          await api.delete(`/addresses/${id}`);
+          set({ isLoading: false });
+          await get().fetchAddresses();
+          return { success: true };
+        } catch (error) {
+          set({ isLoading: false });
+          return { success: false };
+        }
+      },
+
       selectAddress: (id) => set({ selectedAddressId: id }),
       
       placeOrder: ({ items, subtotal, shipping = 150 }) => {
@@ -130,6 +200,12 @@ export const useAuthStore = create()(
     {
       name: 'venus-auth-store',
       storage: createJSONStorage(() => localStorage),
+      onRehydrateStorage: () => (state) => {
+        state?.setHasHydrated(true);
+        if (state?.isAuthenticated) {
+          state.fetchAddresses();
+        }
+      },
       partialize: (state) => ({
         isAuthenticated: state.isAuthenticated,
         user: state.user,

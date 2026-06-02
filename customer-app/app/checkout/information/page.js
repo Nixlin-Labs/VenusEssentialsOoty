@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import OrderSummary from "@/components/checkout/OrderSummary";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import { useAuthStore } from "@/lib/authStore";
@@ -16,12 +16,14 @@ export default function CheckoutInformationPage() {
   const selectedAddressId = useAuthStore((state) => state.selectedAddressId);
   const selectAddress = useAuthStore((state) => state.selectAddress);
   const addAddress = useAuthStore((state) => state.addAddress);
+  const fetchAddresses = useAuthStore((state) => state.fetchAddresses);
   const cartItems = useCart((state) => state.items);
+  
   const [useNewAddress, setUseNewAddress] = useState(false);
   const [newAddress, setNewAddress] = useState({
     label: "Home",
-    fullName: user?.name || "",
-    mobile: user?.mobile || "",
+    fullName: "",
+    mobile: "",
     line1: "",
     line2: "",
     city: "",
@@ -29,6 +31,20 @@ export default function CheckoutInformationPage() {
     pincode: "",
     country: "India",
   });
+
+  useEffect(() => {
+    fetchAddresses();
+  }, [fetchAddresses]);
+
+  useEffect(() => {
+    if (user) {
+      setNewAddress((p) => ({
+        ...p,
+        fullName: user.name || "",
+        mobile: user.phone || user.mobile || "",
+      }));
+    }
+  }, [user]);
 
   const subtotal = useMemo(
     () => cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0),
@@ -46,7 +62,7 @@ export default function CheckoutInformationPage() {
     quantity: item.quantity,
   }));
 
-  const handleSaveNewAddress = () => {
+  const handleSaveNewAddress = async () => {
     if (
       !newAddress.fullName ||
       !newAddress.mobile ||
@@ -55,8 +71,21 @@ export default function CheckoutInformationPage() {
     ) {
       return;
     }
-    addAddress(newAddress);
-    setUseNewAddress(false);
+    const res = await addAddress(newAddress);
+    if (res?.success) {
+      setUseNewAddress(false);
+      setNewAddress({
+        label: "Home",
+        fullName: user?.name || "",
+        mobile: user?.phone || user?.mobile || "",
+        line1: "",
+        line2: "",
+        city: "",
+        state: "",
+        pincode: "",
+        country: "India",
+      });
+    }
   };
 
   return (

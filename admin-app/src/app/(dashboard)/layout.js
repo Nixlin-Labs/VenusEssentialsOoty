@@ -15,6 +15,7 @@ const menuItems = [
   { href: '/customers', label: 'Customers', icon: '👥' },
   { href: '/coupons', label: 'Coupons', icon: '🎟️' },
   { href: '/reviews', label: 'Reviews', icon: '⭐' },
+  { href: '/testimonials', label: 'Testimonials', icon: '💬' },
   { href: '/subscribers', label: 'Subscribers', icon: '📧' },
   { href: '/enquiries', label: 'Enquiries', icon: '📩' },
   { href: '/cms', label: 'CMS Pages', icon: '📄' },

@@ -72,6 +72,7 @@ export default function ProductCard({ product, variant = 'default', index = 0 })
       price: price,
       quantity: 1,
       image: imageUrl,
+      availableVariants: product.variants || [],
     });
     setAdded(true);
     setTimeout(() => setAdded(false), 2000);
@@ -177,8 +178,8 @@ export default function ProductCard({ product, variant = 'default', index = 0 })
             className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
           />
         </Link>
-        {/* Quick Add hover overlay */}
-        <div className="absolute inset-x-0 bottom-0 z-10 translate-y-full p-3 transition-transform duration-300 ease-out group-hover:translate-y-0">
+        {/* Desktop Quick Add hover overlay */}
+        <div className="hidden md:block absolute inset-x-0 bottom-0 z-10 translate-y-full p-3 transition-transform duration-300 ease-out group-hover:translate-y-0">
           <button
             type="button"
             onClick={handleQuickAdd}
@@ -209,6 +210,43 @@ export default function ProductCard({ product, variant = 'default', index = 0 })
             </AnimatePresence>
           </button>
         </div>
+
+        {/* Mobile circular Quick Add button */}
+        <button
+          type="button"
+          onClick={handleQuickAdd}
+          disabled={isOutOfStock}
+          className={`md:hidden absolute bottom-3 right-3 z-20 flex h-10 w-10 items-center justify-center rounded-full shadow-md backdrop-blur-xs transition-all active:scale-95 ${
+            isOutOfStock 
+              ? 'bg-outline-variant text-on-surface-variant cursor-not-allowed' 
+              : 'bg-primary text-white hover:bg-secondary'
+          }`}
+          aria-label="Quick add to cart"
+        >
+          <AnimatePresence mode="wait">
+            {added ? (
+              <motion.span
+                key="added"
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.8 }}
+                className="material-symbols-outlined text-[18px]"
+              >
+                check
+              </motion.span>
+            ) : (
+              <motion.span 
+                key="cart" 
+                initial={{ opacity: 0, scale: 0.8 }} 
+                animate={{ opacity: 1, scale: 1 }} 
+                exit={{ opacity: 0, scale: 0.8 }}
+                className="material-symbols-outlined text-[18px]"
+              >
+                {isOutOfStock ? 'block' : 'shopping_bag'}
+              </motion.span>
+            )}
+          </AnimatePresence>
+        </button>
       </div>
 
       <div className="flex flex-grow flex-col">

@@ -63,12 +63,35 @@ export default function CheckoutPaymentPage() {
     setError('');
 
     try {
-      // Create order via backend
-      const payload = {
-        addressId: selectedAddress._id || selectedAddress.id,
+      // Map items with matching variant IDs from cart items
+      const mappedItems = cartItems.map(item => {
+        const variantObj = item.availableVariants?.find(v => v.name === item.variant) || {};
+        return {
+          productId: item.productId,
+          variantId: item.variantId || variantObj._id || variantObj.id || item.productId,
+          quantity: item.quantity
+        };
+      });
+
+      // Map shipping address matching backend schema
+      const mappedShippingAddress = {
+        fullName: selectedAddress.fullName,
+        phone: selectedAddress.mobile,
+        addressLine1: selectedAddress.line1,
+        addressLine2: selectedAddress.line2 || '',
+        city: selectedAddress.city,
+        state: selectedAddress.state,
+        pincode: selectedAddress.pincode,
+        landmark: selectedAddress.landmark || '',
       };
 
-      const { data } = await api.post('/checkout/create-order', payload);
+      // Create order via backend payments controller
+      const payload = {
+        items: mappedItems,
+        shippingAddress: mappedShippingAddress,
+      };
+
+      const { data } = await api.post('/payments/create-order', payload);
       const order = data.data;
 
       const options = {

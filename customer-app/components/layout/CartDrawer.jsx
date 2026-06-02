@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useCart } from '@/lib/cartStore';
@@ -22,6 +23,17 @@ export default function CartDrawer() {
   const openAuthModal = useAuthStore((state) => state.openAuthModal);
   const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
+
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isOpen]);
 
   const handleCheckoutClick = () => {
     if (!isAuthenticated) {
@@ -70,9 +82,18 @@ export default function CartDrawer() {
 
             <div className="flex-1 overflow-y-auto px-6 py-4">
               {items.length === 0 ? (
-                <p className="py-12 text-center font-body text-on-surface-variant">
-                  Your cart is empty. Discover our Nilgiri botanicals.
-                </p>
+                <>
+                  <p className="py-12 text-center font-body text-on-surface-variant">
+                    Your cart is empty. Discover our Nilgiri botanicals.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={closeCart}
+                    className="mb-3 flex w-full items-center justify-center gap-2 rounded-md bg-primary-container py-4 font-body text-sm uppercase tracking-wider text-white transition-colors hover:bg-secondary"
+                  >
+                    Continue Shopping
+                  </button>
+                </>
               ) : (
                 <ul className="space-y-0">
                   {items.map((item) => (
@@ -92,9 +113,23 @@ export default function CartDrawer() {
                               <p className="font-body text-[15px] font-medium text-charcoal">
                                 {item.name}
                               </p>
-                              <p className="font-body text-[13px] text-[#727973]">
-                                {item.variant}
-                              </p>
+                              {item.availableVariants && item.availableVariants.length > 0 ? (
+                                <CustomSelect
+                                  options={item.availableVariants.map(v => ({ label: v.name, value: v.name }))}
+                                  value={item.variant}
+                                  onChange={(val) => {
+                                    const newVar = item.availableVariants.find(v => v.name === val);
+                                    const newPrice = newVar?.offerPrice && newVar.offerPrice < newVar.price ? newVar.offerPrice : newVar?.price;
+                                    updateVariant(item.id, val, newPrice);
+                                  }}
+                                  size="sm"
+                                  className="mt-1 w-32"
+                                />
+                              ) : (
+                                <p className="font-body text-[13px] text-[#727973]">
+                                  {item.variant}
+                                </p>
+                              )}
                             </div>
                             <p className="shrink-0 font-body text-[15px] font-medium text-charcoal">
                               {formatINR(item.price * item.quantity)}
@@ -133,7 +168,7 @@ export default function CartDrawer() {
                   <span className="font-body text-base text-on-surface-variant">
                     Subtotal
                   </span>
-                  <span className="font-display text-[28px] text-charcoal">
+                  <span className="font-bold text-[28px] text-charcoal">
                     {formatINR(subtotal)}
                   </span>
                 </div>

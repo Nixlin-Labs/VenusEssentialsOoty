@@ -87,6 +87,31 @@ export default function AdminCustomersPage() {
                   <div><span className="text-muted block">Joined</span>{new Date(selectedCustomer.customer?.createdAt || selectedCustomer.createdAt).toLocaleDateString('en-IN')}</div>
                   <div><span className="text-muted block">Status</span>{(selectedCustomer.customer || selectedCustomer).isBlocked ? 'Blocked' : 'Active'}</div>
                 </div>
+                {selectedCustomer.addresses && selectedCustomer.addresses.length > 0 && (
+                  <div>
+                    <h4 className="font-semibold mt-4 mb-2">Saved Addresses ({selectedCustomer.addresses.length})</h4>
+                    <div className="space-y-2">
+                      {selectedCustomer.addresses.map((addr) => (
+                        <div key={addr._id} className="p-3 border border-border rounded-lg bg-surface-container-low text-xs">
+                          <div className="flex justify-between font-medium">
+                            <span className="capitalize">{addr.fullName} ({addr.type || 'home'})</span>
+                            <span>{addr.phone}</span>
+                          </div>
+                          <div className="text-muted mt-1">
+                            {addr.addressLine1}
+                            {addr.addressLine2 ? `, ${addr.addressLine2}` : ''}
+                            {addr.landmark ? ` (Landmark: ${addr.landmark})` : ''}
+                            <br />
+                            {addr.city}, {addr.state} - {addr.pincode}
+                          </div>
+                          {addr.isDefault && (
+                            <span className="inline-block mt-1 px-1.5 py-0.5 bg-success-bg text-success text-[10px] rounded font-bold uppercase tracking-wider">Default</span>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
                 {selectedCustomer.orders && selectedCustomer.orders.length > 0 && (
                   <div>
                     <h4 className="font-semibold mt-4 mb-2">Recent Orders ({selectedCustomer.orders.length})</h4>

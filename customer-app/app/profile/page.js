@@ -1,12 +1,14 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import ProtectedRoute from '@/components/auth/ProtectedRoute';
 import { useAuthStore } from '@/lib/authStore';
+import { useConfirmStore } from '@/store/useConfirmStore';
+import { toast } from 'sonner';
 
 const initialAddressForm = {
   label: '',
@@ -51,16 +53,61 @@ export default function ProfilePage() {
   const user = useAuthStore((state) => state.user);
   const addresses = useAuthStore((state) => state.addresses);
   const updateProfile = useAuthStore((state) => state.updateProfile);
+  const fetchAddresses = useAuthStore((state) => state.fetchAddresses);
   const addAddress = useAuthStore((state) => state.addAddress);
   const updateAddress = useAuthStore((state) => state.updateAddress);
   const deleteAddress = useAuthStore((state) => state.deleteAddress);
   const logout = useAuthStore((state) => state.logout);
+  const confirm = useConfirmStore((state) => state.confirm);
+
+  useEffect(() => {
+    fetchAddresses();
+  }, [fetchAddresses]);
+
+  const handleLogout = async () => {
+    const ok = await confirm({
+      title: 'Sign Out?',
+      message: 'Are you sure you want to sign out of your Venus Essentials account?',
+      confirmText: 'Yes, Sign Out',
+      cancelText: 'Cancel',
+      variant: 'danger',
+    });
+    if (ok) {
+      logout();
+      toast.success('Signed out successfully');
+    }
+  };
+
+  const handleDeleteAddress = async (id) => {
+    const ok = await confirm({
+      title: 'Delete Address?',
+      message: 'Are you sure you want to delete this saved address?',
+      confirmText: 'Delete',
+      cancelText: 'Keep',
+      variant: 'danger',
+    });
+    if (ok) {
+      deleteAddress(id);
+      toast.success('Address deleted successfully');
+    }
+  };
 
   const [profileForm, setProfileForm] = useState({
-    name: user?.name || '',
-    email: user?.email || '',
-    mobile: user?.mobile || '',
+    name: '',
+    email: '',
+    mobile: '',
   });
+
+  useEffect(() => {
+    if (user) {
+      setProfileForm({
+        name: user.name || '',
+        email: user.email || '',
+        mobile: user.phone || user.mobile || '',
+      });
+    }
+  }, [user]);
+
   const [profileSaved, setProfileSaved] = useState(false);
   const [addressForm, setAddressForm] = useState(initialAddressForm);
   const [editingAddressId, setEditingAddressId] = useState('');
@@ -72,11 +119,19 @@ export default function ProfilePage() {
   const setP = setField(setProfileForm);
   const setA = setField(setAddressForm);
 
-  const handleSaveProfile = (e) => {
+  const handleSaveProfile = async (e) => {
     e.preventDefault();
-    updateProfile(profileForm);
-    setProfileSaved(true);
-    setTimeout(() => setProfileSaved(false), 2500);
+    const success = await updateProfile({
+      name: profileForm.name,
+      phone: profileForm.mobile
+    });
+    if (success) {
+      setProfileSaved(true);
+      toast.success('Profile updated successfully');
+      setTimeout(() => setProfileSaved(false), 2500);
+    } else {
+      toast.error('Failed to update profile');
+    }
   };
 
   const handleSubmitAddress = (e) => {
@@ -128,7 +183,7 @@ export default function ProfilePage() {
               </Link>
               <button
                 type="button"
-                onClick={logout}
+                onClick={handleLogout}
                 className="inline-flex items-center gap-1.5 font-body text-sm text-error hover:underline"
               >
                 <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>logout</span>
@@ -239,7 +294,7 @@ export default function ProfilePage() {
                           </button>
                           <button
                             type="button"
-                            onClick={() => deleteAddress(address.id)}
+                            onClick={() => handleDeleteAddress(address.id)}
                             className="rounded-md px-3 py-1.5 font-body text-xs text-error transition-colors hover:bg-error-container/30"
                           >
                             Delete

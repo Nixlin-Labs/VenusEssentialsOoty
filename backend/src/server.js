@@ -58,6 +58,7 @@ app.use('/api/wishlist', wishlistRoutes);
 app.use('/api/cms', cmsRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/newsletter', newsletterRoutes);
+app.use('/api/testimonials', require('./routes/testimonials.routes'));
 app.use('/api/enquiries', require('./routes/enquiry.routes'));
 app.use('/api/settings', require('./routes/settings.routes'));
 

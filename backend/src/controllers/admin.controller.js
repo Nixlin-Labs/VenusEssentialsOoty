@@ -1,6 +1,6 @@
 const {
   Product, ProductVariant, Category, Order, User, Coupon, Review,
-  CmsPage, Banner, Role, Settings, AuditLog, Payment, NewsletterSubscriber, Enquiry,
+  CmsPage, Banner, Role, Settings, AuditLog, Payment, NewsletterSubscriber, Enquiry, Testimonial, Address,
 } = require('../models');
 const { paginate } = require('../utils/pagination');
 const { generateUniqueSlug } = require('../utils/slugify');
@@ -495,7 +495,8 @@ exports.getCustomerById = async (req, res, next) => {
     if (!customer) return response.notFound(res, 'Customer');
 
     const orders = await Order.find({ user: customer._id }).sort({ createdAt: -1 }).limit(20);
-    return response.success(res, { data: { customer, orders } });
+    const addresses = await Address.find({ user: customer._id }).sort({ isDefault: -1, createdAt: -1 });
+    return response.success(res, { data: { customer, orders, addresses } });
   } catch (error) { next(error); }
 };
 
@@ -1077,4 +1078,48 @@ exports.toggleEnquiryRead = async (req, res, next) => {
   } catch (error) { next(error); }
 };
 
+// ==================== TESTIMONIALS ====================
 
+exports.getTestimonials = async (req, res, next) => {
+  try {
+    const testimonials = await Testimonial.find().sort({ sortOrder: 1, createdAt: -1 });
+    return response.success(res, { data: testimonials });
+  } catch (error) { next(error); }
+};
+
+exports.createTestimonial = async (req, res, next) => {
+  try {
+    const testimonial = await Testimonial.create(req.body);
+    return response.created(res, { data: testimonial }, 'Testimonial created');
+  } catch (error) { next(error); }
+};
+
+exports.updateTestimonial = async (req, res, next) => {
+  try {
+    const testimonial = await Testimonial.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true, runValidators: true }
+    );
+    if (!testimonial) return response.notFound(res, 'Testimonial');
+    return response.success(res, { data: testimonial }, 'Testimonial updated');
+  } catch (error) { next(error); }
+};
+
+exports.deleteTestimonial = async (req, res, next) => {
+  try {
+    const testimonial = await Testimonial.findByIdAndDelete(req.params.id);
+    if (!testimonial) return response.notFound(res, 'Testimonial');
+    return response.success(res, {}, 'Testimonial deleted');
+  } catch (error) { next(error); }
+};
+
+exports.toggleTestimonialStatus = async (req, res, next) => {
+  try {
+    const testimonial = await Testimonial.findById(req.params.id);
+    if (!testimonial) return response.notFound(res, 'Testimonial');
+    testimonial.isActive = !testimonial.isActive;
+    await testimonial.save();
+    return response.success(res, { data: testimonial }, `Testimonial ${testimonial.isActive ? 'activated' : 'deactivated'}`);
+  } catch (error) { next(error); }
+};

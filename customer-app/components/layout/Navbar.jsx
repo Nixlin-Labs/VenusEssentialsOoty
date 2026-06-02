@@ -9,6 +9,8 @@ import { useCart } from "@/lib/cartStore";
 import { useAuthStore } from "@/lib/authStore";
 import { useSettingsStore } from "@/lib/settingsStore";
 import api from "@/lib/api";
+import { useConfirmStore } from "@/store/useConfirmStore";
+import { toast } from "sonner";
 
 function SearchIcon() {
   return (
@@ -114,6 +116,22 @@ export default function Navbar({ activeLink }) {
   const user = useAuthStore((state) => state.user);
   const openAuthModal = useAuthStore((state) => state.openAuthModal);
   const logout = useAuthStore((state) => state.logout);
+  const confirm = useConfirmStore((state) => state.confirm);
+
+  const handleLogout = async () => {
+    const ok = await confirm({
+      title: 'Sign Out?',
+      message: 'Are you sure you want to sign out of your Venus Essentials account?',
+      confirmText: 'Yes, Sign Out',
+      cancelText: 'Cancel',
+      variant: 'danger',
+    });
+    if (ok) {
+      logout();
+      setProfileMenuOpen(false);
+      toast.success('Signed out successfully');
+    }
+  };
   const { settings } = useSettingsStore();
   const whatsappNumber = settings?.whatsapp || settings?.storePhone || "";
 
@@ -185,9 +203,8 @@ export default function Navbar({ activeLink }) {
                 <div key={link.label} className="relative group">
                   <Link
                     href="/shop"
-                    className={`font-body text-sm text-on-surface-variant transition-colors hover:text-primary-container ${
-                      isActive(link) ? "nav-link-active" : ""
-                    }`}
+                    className={`font-body text-sm text-on-surface-variant transition-colors hover:text-primary-container ${isActive(link) ? "nav-link-active" : ""
+                      }`}
                   >
                     Categories
                   </Link>
@@ -207,9 +224,8 @@ export default function Navbar({ activeLink }) {
                 <Link
                   key={link.label}
                   href={link.href}
-                  className={`font-body text-sm text-on-surface-variant transition-colors hover:text-primary-container ${
-                    isActive(link) ? "nav-link-active" : ""
-                  }`}
+                  className={`font-body text-sm text-on-surface-variant transition-colors hover:text-primary-container ${isActive(link) ? "nav-link-active" : ""
+                    }`}
                 >
                   {link.label}
                 </Link>
@@ -244,12 +260,12 @@ export default function Navbar({ activeLink }) {
                       exit={{ opacity: 0, y: 8 }}
                       className="absolute right-0 z-50 w-48 p-2 mt-2 border rounded-lg top-full border-outline-variant bg-surface shadow-card"
                     >
-                      <p className="border-b border-surface-container px-2 pb-2 text-xs text-[#727973]">
+                      <p className="px-2 py-2 mb-1 text-sm font-medium rounded-md text-primary border-b border-outline-variant">
                         {user?.name || "Profile"}
                       </p>
                       <Link
                         href="/profile"
-                        className="block px-2 py-2 mt-2 text-sm rounded-md text-on-surface-variant hover:bg-surface-container"
+                        className="block px-2 py-2 text-sm rounded-md text-on-surface-variant hover:bg-surface-container"
                         onClick={() => setProfileMenuOpen(false)}
                       >
                         Profile
@@ -261,20 +277,10 @@ export default function Navbar({ activeLink }) {
                       >
                         My Orders
                       </Link>
-                      <Link
-                        href="/wishlist"
-                        className="block px-2 py-2 text-sm rounded-md text-on-surface-variant hover:bg-surface-container"
-                        onClick={() => setProfileMenuOpen(false)}
-                      >
-                        Wishlist
-                      </Link>
                       <button
                         type="button"
                         className="w-full px-2 py-2 text-sm text-left rounded-md text-on-surface-variant hover:bg-surface-container"
-                        onClick={() => {
-                          logout();
-                          setProfileMenuOpen(false);
-                        }}
+                        onClick={handleLogout}
                       >
                         Logout
                       </button>
@@ -358,11 +364,10 @@ export default function Navbar({ activeLink }) {
                       <Link
                         href={link.href}
                         onClick={() => setMobileOpen(false)}
-                        className={`font-body text-base ${
-                          isActive(link)
+                        className={`font-body text-base ${isActive(link)
                             ? "font-medium text-primary-container"
                             : "text-on-surface-variant"
-                        }`}
+                          }`}
                       >
                         {link.label}
                       </Link>
@@ -382,29 +387,31 @@ export default function Navbar({ activeLink }) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[150] flex flex-col bg-surface/98 backdrop-blur-md px-6 py-6"
+            className="fixed inset-0 z-[150] flex flex-col bg-background backdrop-blur-lg px-6 py-8 overflow-y-auto"
           >
-            {/* Search Header */}
-            <div className="flex items-center justify-between pb-6 border-b container-main border-outline-variant">
-              <Link href="/" className="text-xl font-display text-charcoal">
-                Venus Ooty Essentials
-              </Link>
-              <button
-                type="button"
-                onClick={() => {
-                  setIsSearchOpen(false);
-                  setSearchQuery("");
-                  setSearchResults([]);
-                }}
-                className="flex items-center justify-center w-10 h-10 transition-colors rounded-full bg-surface-container hover:bg-surface-high"
-                aria-label="Close search"
-              >
-                <span className="material-symbols-outlined text-charcoal">close</span>
-              </button>
+            {/* Search Header (Matches screenshot: Center brand header with close button next to it) */}
+            <div className="flex flex-col items-center pt-6 md:pt-12">
+              <div className="flex items-center gap-3 mb-6">
+                <span className="font-display text-2xl md:text-3xl text-charcoal tracking-wide">
+                  Venus Ooty Essentials
+                </span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsSearchOpen(false);
+                    setSearchQuery("");
+                    setSearchResults([]);
+                  }}
+                  className="flex h-8 w-8 items-center justify-center rounded-full bg-surface-container hover:bg-surface-high transition-colors shadow-sm"
+                  aria-label="Close search"
+                >
+                  <span className="material-symbols-outlined text-[18px] text-charcoal">close</span>
+                </button>
+              </div>
             </div>
 
-            {/* Search Input */}
-            <div className="flex flex-col flex-1 w-full max-w-2xl pt-16 mx-auto container-main">
+            {/* Search Input Container (Matches screenshot: solid green underline, placeholder, search icon at the right end) */}
+            <div className="w-full max-w-2xl mx-auto px-4">
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
@@ -423,68 +430,124 @@ export default function Navbar({ activeLink }) {
                   placeholder="Search for eucalyptus oil, soaps, skincare..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full py-4 pl-2 pr-12 text-xl transition-colors bg-transparent border-0 border-b-2 outline-none border-outline-variant font-body text-charcoal placeholder:text-outline focus:border-primary"
+                  className="w-full py-4 pl-2 pr-12 text-lg md:text-xl bg-transparent border-0 border-b-2 outline-none border-primary font-body text-charcoal placeholder:text-outline-variant focus:border-secondary transition-colors"
                 />
                 <button
                   type="submit"
-                  className="absolute transition-colors -translate-y-1/2 right-2 top-1/2 text-on-surface-variant hover:text-charcoal"
+                  className="absolute -translate-y-1/2 right-2 top-1/2 text-primary hover:text-secondary transition-colors"
                 >
-                  <SearchIcon />
+                  <span className="material-symbols-outlined text-[22px]">search</span>
                 </button>
               </form>
+            </div>
 
-              {/* Search Results */}
-              {searchQuery.trim() && (
-                <>
-                  {searchLoading ? (
-                    <div className="flex justify-center mt-12">
-                      <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-                    </div>
-                  ) : searchResults.length > 0 ? (
-                    <div className="p-4 mt-8 border rounded-xl border-outline-variant bg-surface shadow-botanical-hover">
-                      <p className="mb-3 font-body text-[11px] font-semibold uppercase tracking-widest text-[#727973] px-3">
-                        Suggested Products
-                      </p>
-                      <div className="space-y-1">
-                        {searchResults.map((p) => {
-                          const imgUrl = p.images?.[0]?.url ? getImageUrl(p.images[0].url) : null;
-                          const defaultVariant = p.variants?.find(v => v.isDefault) || p.variants?.[0];
-                          const price = defaultVariant?.offerPrice || defaultVariant?.price || 0;
-                          return (
-                            <Link
-                              key={p._id}
-                              href={`/products/${p.slug}`}
-                              onClick={() => {
-                                setIsSearchOpen(false);
-                                setSearchQuery("");
-                                setSearchResults([]);
-                              }}
-                              className="flex items-center gap-4 p-3 transition-colors rounded-lg hover:bg-surface-container"
-                            >
-                              {imgUrl ? (
-                                <img src={imgUrl} alt={p.name} className="object-cover w-12 h-12 rounded-md" />
-                              ) : (
-                                <div className="w-12 h-12 rounded-md bg-surface-container flex items-center justify-center">
-                                  <span className="material-symbols-outlined text-outline text-[20px]">spa</span>
-                                </div>
-                              )}
-                              <div className="flex-1 min-w-0">
-                                <p className="text-sm font-medium truncate font-body text-charcoal">{p.name}</p>
-                                <p className="text-xs font-body text-on-surface-variant">{p.category?.name}</p>
-                              </div>
-                              <span className="text-sm font-semibold font-body text-primary">₹{price}</span>
-                            </Link>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  ) : (
-                    <p className="mt-8 text-sm text-center font-body text-on-surface-variant">
-                      No products found for &ldquo;{searchQuery}&rdquo;
+            {/* AJIO-Style Two-Column Search Suggestions Panel (Responsive: 1 col on mobile, 2 col on desktop) */}
+            <div className="w-full max-w-3xl mx-auto mt-10 grid grid-cols-1 md:grid-cols-[1.2fr_2fr] gap-8 overflow-y-auto max-h-[60vh] pr-2">
+
+              {/* Left Column: Popular / Search Suggestions */}
+              <div className="space-y-6">
+                {searchQuery.trim() === "" ? (
+                  <div>
+                    <p className="font-body text-[11px] font-bold uppercase tracking-[0.15em] text-outline mb-3">
+                      Popular Searches
                     </p>
-                  )}
-                </>
-              )}
+                    <div className="flex flex-col gap-2">
+                      {["Eucalyptus Oil", "Handmade Soap", "Herbal Tea", "Hair Care", "Essential Oils"].map((trend) => (
+                        <button
+                          key={trend}
+                          type="button"
+                          onClick={() => {
+                            setSearchQuery(trend);
+                            router.push(`/shop?search=${encodeURIComponent(trend)}`);
+                            setIsSearchOpen(false);
+                          }}
+                          className="flex items-center gap-2 font-body text-sm text-left text-on-surface-variant hover:text-primary transition-colors py-1.5"
+                        >
+                          <span className="material-symbols-outlined text-[16px] text-outline">trending_up</span>
+                          {trend}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  <div>
+                    <p className="font-body text-[11px] font-bold uppercase tracking-[0.15em] text-outline mb-3">
+                      Search Suggestions
+                    </p>
+                    <div className="flex flex-col gap-2">
+                      {searchResults.slice(0, 4).map((p) => (
+                        <button
+                          key={p._id}
+                          type="button"
+                          onClick={() => {
+                            setSearchQuery(p.name);
+                            router.push(`/shop?search=${encodeURIComponent(p.name)}`);
+                            setIsSearchOpen(false);
+                          }}
+                          className="flex items-center gap-2 font-body text-sm text-left text-on-surface-variant hover:text-primary transition-colors py-1.5 truncate"
+                        >
+                          <span className="material-symbols-outlined text-[16px] text-outline">search</span>
+                          {p.name}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Right Column: Instant Products Preview */}
+              <div>
+                <p className="font-body text-[11px] font-bold uppercase tracking-[0.15em] text-outline mb-3">
+                  Product Results
+                </p>
+                {searchLoading ? (
+                  <div className="flex justify-center py-6">
+                    <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+                  </div>
+                ) : searchResults.length > 0 ? (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {searchResults.map((p) => {
+                      const imgUrl = p.images?.[0]?.url ? getImageUrl(p.images[0].url) : null;
+                      const defaultVariant = p.variants?.find(v => v.isDefault) || p.variants?.[0];
+                      const price = defaultVariant?.offerPrice || defaultVariant?.price || 0;
+                      return (
+                        <Link
+                          key={p._id}
+                          href={`/products/${p.slug}`}
+                          onClick={() => {
+                            setIsSearchOpen(false);
+                            setSearchQuery("");
+                            setSearchResults([]);
+                          }}
+                          className="flex items-center gap-3 p-2.5 rounded-2xl border border-outline-variant/30 hover:border-primary/30 bg-white/50 hover:bg-white transition-all shadow-xs"
+                        >
+                          {imgUrl ? (
+                            <img src={imgUrl} alt={p.name} className="object-cover w-12 h-12 rounded-lg shrink-0" />
+                          ) : (
+                            <div className="w-12 h-12 rounded-lg bg-surface-container flex items-center justify-center shrink-0">
+                              <span className="material-symbols-outlined text-outline text-[18px]">spa</span>
+                            </div>
+                          )}
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-semibold truncate font-body text-charcoal">{p.name}</p>
+                            <p className="text-xs font-body text-outline truncate">{p.category?.name}</p>
+                            <p className="text-xs font-bold font-body text-secondary mt-0.5">₹{price}</p>
+                          </div>
+                        </Link>
+                      );
+                    })}
+                  </div>
+                ) : searchQuery.trim() !== "" ? (
+                  <p className="text-sm font-body text-outline text-center py-6">
+                    No products found for &ldquo;{searchQuery}&rdquo;
+                  </p>
+                ) : (
+                  <p className="text-sm font-body text-outline text-center py-6">
+                    Start typing to discover Nilgiri wellness treasures.
+                  </p>
+                )}
+              </div>
+
             </div>
           </motion.div>
         )}
