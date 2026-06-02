@@ -1,12 +1,38 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { testimonials } from '@/lib/data';
+
+// Static fallback data shown while loading or if API fails
+const FALLBACK = [
+  {
+    _id: 'f1',
+    name: 'Priya Sharma',
+    location: 'Bangalore',
+    text: "The Nilgiri Eucalyptus Oil is unlike anything I've tried. Pure, potent, and instantly transports me to the misty hills.",
+    rating: 5,
+  },
+  {
+    _id: 'f2',
+    name: 'James Mitchell',
+    location: 'London',
+    text: 'Wild Vetiver Soap has become my daily ritual. The earthy scent and creamy lather are absolutely divine.',
+    rating: 5,
+  },
+  {
+    _id: 'f3',
+    name: 'Ananya Reddy',
+    location: 'Chennai',
+    text: 'Finally, skincare that feels as pure as the Nilgiris themselves. Venus Ooty Essentials is a treasure.',
+    rating: 5,
+  },
+];
+
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
 
 function StarRow({ rating }) {
   return (
-    <div className="flex gap-0.5 text-sand">
+    <div className="flex gap-0.5 text-sand justify-center">
       {Array.from({ length: 5 }).map((_, i) => (
         <span
           key={i}
@@ -30,12 +56,34 @@ const QUOTE_ICON = (
 );
 
 export default function Testimonials() {
+  const [testimonials, setTestimonials] = useState(FALLBACK);
   const [active, setActive] = useState(0);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchTestimonials = async () => {
+      try {
+        const res = await fetch(`${API_BASE}/testimonials`);
+        if (!res.ok) throw new Error('Failed');
+        const json = await res.json();
+        const items = json?.data;
+        if (Array.isArray(items) && items.length > 0) {
+          setTestimonials(items);
+          setActive(0);
+        }
+      } catch {
+        // keep fallback
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchTestimonials();
+  }, []);
 
   const prev = () => setActive((a) => (a === 0 ? testimonials.length - 1 : a - 1));
   const next = () => setActive((a) => (a === testimonials.length - 1 ? 0 : a + 1));
 
-  const t = testimonials[active];
+  const t = testimonials[active] || testimonials[0];
 
   return (
     <section className="relative overflow-hidden bg-primary section-spacing">
@@ -60,65 +108,75 @@ export default function Testimonials() {
 
         {/* Testimonial card */}
         <div className="max-w-2xl mx-auto">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={active}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.4, ease: 'easeInOut' }}
-              className="text-center"
-            >
-              <div className="flex justify-center mb-6">{QUOTE_ICON}</div>
-              <StarRow rating={t.rating} />
-              <p className="mt-6 text-xl leading-relaxed font-display text-white/90 md:text-2xl">
-                &ldquo;{t.text}&rdquo;
-              </p>
-              <div className="mt-8">
-                <p className="text-sm font-semibold font-body text-sand">{t.name}</p>
-                <p className="mt-1 text-xs font-body text-white/50">{t.location}</p>
-              </div>
-            </motion.div>
-          </AnimatePresence>
-
-          {/* Controls */}
-          <div className="flex items-center justify-center gap-6 mt-10">
-            <button
-              type="button"
-              onClick={prev}
-              aria-label="Previous testimonial"
-              className="flex items-center justify-center w-10 h-10 transition-all border rounded-full border-white/20 text-white/60 hover:border-white/50 hover:text-white"
-            >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                <path d="M15 18l-6-6 6-6" />
-              </svg>
-            </button>
-
-            <div className="flex gap-2">
-              {testimonials.map((_, i) => (
-                <button
-                  key={i}
-                  type="button"
-                  onClick={() => setActive(i)}
-                  aria-label={`Go to testimonial ${i + 1}`}
-                  className={`h-1.5 rounded-full transition-all duration-300 ${
-                    i === active ? 'w-8 bg-sand' : 'w-1.5 bg-white/30'
-                  }`}
-                />
-              ))}
+          {loading ? (
+            <div className="text-center py-12">
+              <div className="inline-block w-8 h-8 border-2 border-sand/30 border-t-sand rounded-full animate-spin" />
             </div>
+          ) : (
+            <>
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={t._id || active}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  transition={{ duration: 0.4, ease: 'easeInOut' }}
+                  className="text-center"
+                >
+                  <div className="flex justify-center mb-6">{QUOTE_ICON}</div>
+                  <StarRow rating={t.rating} />
+                  <p className="mt-6 text-xl leading-relaxed font-display text-white/90 md:text-2xl">
+                    &ldquo;{t.text}&rdquo;
+                  </p>
+                  <div className="mt-8">
+                    <p className="text-sm font-semibold font-body text-sand">{t.name}</p>
+                    {t.location && (
+                      <p className="mt-1 text-xs font-body text-white/50">{t.location}</p>
+                    )}
+                  </div>
+                </motion.div>
+              </AnimatePresence>
 
-            <button
-              type="button"
-              onClick={next}
-              aria-label="Next testimonial"
-              className="flex items-center justify-center w-10 h-10 transition-all border rounded-full border-white/20 text-white/60 hover:border-white/50 hover:text-white"
-            >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                <path d="M9 18l6-6-6-6" />
-              </svg>
-            </button>
-          </div>
+              {/* Controls */}
+              <div className="flex items-center justify-center gap-6 mt-10">
+                <button
+                  type="button"
+                  onClick={prev}
+                  aria-label="Previous testimonial"
+                  className="flex items-center justify-center w-10 h-10 transition-all border rounded-full border-white/20 text-white/60 hover:border-white/50 hover:text-white"
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                    <path d="M15 18l-6-6 6-6" />
+                  </svg>
+                </button>
+
+                <div className="flex gap-2">
+                  {testimonials.map((_, i) => (
+                    <button
+                      key={i}
+                      type="button"
+                      onClick={() => setActive(i)}
+                      aria-label={`Go to testimonial ${i + 1}`}
+                      className={`h-1.5 rounded-full transition-all duration-300 ${
+                        i === active ? 'w-8 bg-sand' : 'w-1.5 bg-white/30'
+                      }`}
+                    />
+                  ))}
+                </div>
+
+                <button
+                  type="button"
+                  onClick={next}
+                  aria-label="Next testimonial"
+                  className="flex items-center justify-center w-10 h-10 transition-all border rounded-full border-white/20 text-white/60 hover:border-white/50 hover:text-white"
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                    <path d="M9 18l6-6-6-6" />
+                  </svg>
+                </button>
+              </div>
+            </>
+          )}
         </div>
       </div>
     </section>

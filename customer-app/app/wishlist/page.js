@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { toast } from 'sonner';
+import { useConfirmStore } from '@/store/useConfirmStore';
 import { motion, AnimatePresence } from 'framer-motion';
 import api from '@/lib/api';
 import { useAuthStore } from '@/lib/authStore';
@@ -33,10 +34,21 @@ export default function WishlistPage() {
     if (isAuthenticated) fetchWishlist(); 
   }, [isAuthenticated]);
 
+  const confirm = useConfirmStore((state) => state.confirm);
+
   const handleRemove = async (productId) => {
+    const ok = await confirm({
+      title: 'Remove from Wishlist?',
+      message: 'Are you sure you want to remove this botanical treasure from your wishlist?',
+      confirmText: 'Yes, Remove',
+      cancelText: 'Keep It',
+      variant: 'danger',
+    });
+    if (!ok) return;
+
     await toggleWishlist(productId);
     setProducts((prev) => prev.filter((p) => p._id !== productId));
-    toast('Removed from wishlist');
+    toast.success('Removed from wishlist');
   };
 
   const handleMoveToCart = async (product) => {

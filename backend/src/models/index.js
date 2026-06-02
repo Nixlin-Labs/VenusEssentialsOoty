@@ -17,6 +17,7 @@ const Notification = require('./Notification');
 const Settings = require('./Settings');
 const NewsletterSubscriber = require('./NewsletterSubscriber');
 const Enquiry = require('./Enquiry');
+const Testimonial = require('./Testimonial');
 
 module.exports = {
   User,
@@ -37,4 +38,5 @@ module.exports = {
   Settings,
   NewsletterSubscriber,
   Enquiry,
+  Testimonial,
 };

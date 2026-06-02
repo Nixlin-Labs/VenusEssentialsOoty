@@ -45,7 +45,7 @@ export const useCart = create()(
           items: state.items.map((i) => (i.id === id ? { ...i, quantity } : i)),
         }));
       },
-      updateVariant: (id, variant) => {
+      updateVariant: (id, variant, price) => {
         const itemToUpdate = get().items.find((i) => i.id === id);
         if (!itemToUpdate) return;
         const existing = get().items.find(
@@ -64,7 +64,7 @@ export const useCart = create()(
         } else {
           set((state) => ({
             items: state.items.map((i) =>
-              i.id === id ? { ...i, variant } : i
+              i.id === id ? { ...i, variant, price: price !== undefined ? price : i.price } : i
             ),
           }));
         }

@@ -11,6 +11,7 @@ import Badge from '@/components/ui/Badge';
 import QuantitySelector from '@/components/ui/QuantitySelector';
 import api from '@/lib/api';
 import { useCart } from '@/lib/cartStore';
+import ProductCard from '@/components/ui/ProductCard';
 
 function AccordionItem({ title, children, defaultOpen = false }) {
   const [open, setOpen] = useState(defaultOpen);
@@ -151,6 +152,7 @@ export default function ProductPage({ params }) {
       price: effectivePrice,
       quantity,
       image: images[0],
+      availableVariants: product.variants || [],
     });
     setAddedToCart(true);
     setTimeout(() => setAddedToCart(false), 2500);
@@ -394,28 +396,9 @@ export default function ProductPage({ params }) {
                 You May Also Like
               </h2>
               <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-4">
-                {related.map((p) => {
-                  const rImg = p.images?.[0] ? getImageUrl(p.images[0].url) : null;
-                  return (
-                    <Link
-                      key={p._id}
-                      href={`/products/${p.slug}`}
-                      className="group flex gap-4 rounded-xl bg-surface-container-low p-4 transition-shadow hover:shadow-card"
-                    >
-                      <div className="h-20 w-20 shrink-0 overflow-hidden rounded-lg">
-                        <img
-                          src={rImg}
-                          alt={p.name}
-                          className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-                        />
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <p className="font-display text-base text-charcoal line-clamp-2">{p.name}</p>
-                        <p className="mt-2 font-body text-sm font-semibold text-primary-container">₹{p.price}</p>
-                      </div>
-                    </Link>
-                  );
-                })}
+                {related.map((p) => (
+                  <ProductCard key={p._id} product={p} variant="collection" />
+                ))}
               </div>
             </section>
           )}

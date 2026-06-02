@@ -118,4 +118,11 @@ router.get('/enquiries', adminController.getEnquiries);
 router.put('/enquiries/:id/read', adminController.toggleEnquiryRead);
 router.delete('/enquiries/:id', adminController.deleteEnquiry);
 
+// ==================== TESTIMONIALS ====================
+router.get('/testimonials', adminController.getTestimonials);
+router.post('/testimonials', adminController.createTestimonial);
+router.put('/testimonials/:id', adminController.updateTestimonial);
+router.delete('/testimonials/:id', adminController.deleteTestimonial);
+router.patch('/testimonials/:id/toggle', adminController.toggleTestimonialStatus);
+
 module.exports = router;
