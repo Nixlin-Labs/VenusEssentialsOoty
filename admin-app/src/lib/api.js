@@ -14,7 +14,7 @@ adminApi.interceptors.request.use((config) => {
     delete config.headers['Content-Type'];
   }
   if (typeof window !== 'undefined') {
-    const token = localStorage.getItem('venus_admin_token');
+    const token = sessionStorage.getItem('venus_admin_token');
     if (token) config.headers.Authorization = `Bearer ${token}`;
   }
   return config;
@@ -24,8 +24,8 @@ adminApi.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401 && typeof window !== 'undefined') {
-      localStorage.removeItem('venus_admin_token');
-      localStorage.removeItem('venus_admin_user');
+      sessionStorage.removeItem('venus_admin_token');
+      sessionStorage.removeItem('venus_admin_user');
       window.location.href = '/login';
     }
     return Promise.reject(error);

@@ -7,7 +7,7 @@ const response = require('../utils/response');
  */
 exports.getProducts = async (req, res, next) => {
   try {
-    const { category, minPrice, maxPrice, inStock, sort, search, page, limit } = req.query;
+    const { category, minPrice, maxPrice, inStock, sort, search, page, limit, isBestSeller, showInBestSellers } = req.query;
 
     const filter = { status: 'active' };
 
@@ -18,6 +18,14 @@ exports.getProducts = async (req, res, next) => {
 
     if (search) {
       filter.$text = { $search: search };
+    }
+
+    if (isBestSeller === 'true') {
+      filter.isBestSeller = true;
+    }
+
+    if (showInBestSellers === 'true') {
+      filter.showInBestSellers = true;
     }
 
     let query = Product.find(filter)

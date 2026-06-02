@@ -74,6 +74,11 @@ const productSchema = new mongoose.Schema(
       default: false,
       index: true,
     },
+    showInBestSellers: {
+      type: Boolean,
+      default: false,
+      index: true,
+    },
     isNewArrival: {
       type: Boolean,
       default: false,

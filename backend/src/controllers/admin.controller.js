@@ -1,6 +1,6 @@
 const {
   Product, ProductVariant, Category, Order, User, Coupon, Review,
-  CmsPage, Banner, Role, Settings, AuditLog, Payment,
+  CmsPage, Banner, Role, Settings, AuditLog, Payment, NewsletterSubscriber, Enquiry,
 } = require('../models');
 const { paginate } = require('../utils/pagination');
 const { generateUniqueSlug } = require('../utils/slugify');
@@ -131,6 +131,8 @@ exports.updateProduct = async (req, res, next) => {
         newImages.push({ url: result.url, alt: data.name || product.name, isPrimary: false, sortOrder: product.images.length + i });
       }
       data.images = [...(data.existingImages || product.images), ...newImages];
+    } else if (data.existingImages) {
+      data.images = data.existingImages;
     }
 
     Object.assign(product, data);
@@ -789,32 +791,199 @@ exports.updateAdminUser = async (req, res, next) => {
 
 exports.getSettings = async (req, res, next) => {
   try {
-    const { group } = req.query;
-    const filter = group ? { group } : {};
-    const settings = await Settings.find(filter);
-    return response.success(res, { data: settings });
-  } catch (error) { next(error); }
+    const dbSettings = await Settings.find();
+
+    const settings = {
+      storeName: '',
+      storeEmail: '',
+      storePhone: '',
+      whatsapp: '',
+      storeAddress: '',
+      gstNumber: '',
+      shippingFreeAbove: 500,
+      shippingCharge: 50,
+      gstPercentage: 18,
+      currency: 'INR',
+      socialMedia: {
+        instagram: '',
+        facebook: '',
+        youtube: '',
+      },
+    };
+
+    const keyMap = {
+      company_name: 'storeName',
+      company_email: 'storeEmail',
+      company_phone: 'storePhone',
+      whatsapp_number: 'whatsapp',
+      company_address: 'storeAddress',
+      gst_number: 'gstNumber',
+      free_shipping_threshold: 'shippingFreeAbove',
+      default_shipping_charge: 'shippingCharge',
+      default_gst_percentage: 'gstPercentage',
+      currency: 'currency',
+    };
+
+    dbSettings.forEach((item) => {
+      if (keyMap[item.key]) {
+        settings[keyMap[item.key]] = item.value;
+      }
+
+      if (item.key === 'instagram_url') {
+        settings.socialMedia.instagram = item.value;
+      }
+
+      if (item.key === 'facebook_url') {
+        settings.socialMedia.facebook = item.value;
+      }
+
+      if (item.key === 'youtube_url') {
+        settings.socialMedia.youtube = item.value;
+      }
+    });
+
+    return response.success(res, {
+      data: settings,
+    });
+  } catch (error) {
+    next(error);
+  }
 };
 
 exports.updateSettings = async (req, res, next) => {
   try {
-    const { settings } = req.body;
-    for (const setting of settings) {
-      await Settings.findOneAndUpdate(
-        { key: setting.key },
-        { value: setting.value, group: setting.group, label: setting.label },
-        { upsert: true, new: true }
-      );
-    }
+    const settings = req.body;
+    console.log('settings', req.body);
+
+const settingsMap = {
+  storeName: {
+    key: 'company_name',
+    group: 'general',
+    label: 'Company Name',
+  },
+  storeEmail: {
+    key: 'company_email',
+    group: 'contact',
+    label: 'Email',
+  },
+  storePhone: {
+    key: 'company_phone',
+    group: 'contact',
+    label: 'Phone',
+  },
+  storeAddress: {
+    key: 'company_address',
+    group: 'general',
+    label: 'Company Address',
+  },
+
+  // These already exist in DB
+  gstNumber: {
+    key: 'gst_number',
+    group: 'tax',
+    label: 'GST Number',
+  },
+  gstPercentage: {
+    key: 'default_gst_percentage',
+    group: 'tax',
+    label: 'Default GST %',
+  },
+  shippingFreeAbove: {
+    key: 'free_shipping_threshold',
+    group: 'shipping',
+    label: 'Free Shipping Threshold (₹)',
+  },
+  shippingCharge: {
+    key: 'default_shipping_charge',
+    group: 'shipping',
+    label: 'Default Shipping Charge (₹)',
+  },
+
+  // Missing in DB currently - will be auto-created
+  whatsapp: {
+    key: 'whatsapp_number',
+    group: 'contact',
+    label: 'WhatsApp Number',
+  },
+  currency: {
+    key: 'currency',
+    group: 'general',
+    label: 'Currency',
+  },
+
+  // SEO settings already exist
+  siteTitle: {
+    key: 'site_title',
+    group: 'seo',
+    label: 'Site Title',
+  },
+  siteDescription: {
+    key: 'site_description',
+    group: 'seo',
+    label: 'Site Description',
+  },
+};
+
+const socialMediaMap = {
+  instagram: {
+    key: 'instagram_url',
+    group: 'social',
+    label: 'Instagram URL',
+  },
+  facebook: {
+    key: 'facebook_url',
+    group: 'social',
+    label: 'Facebook URL',
+  },
+  youtube: {
+    key: 'youtube_url',
+    group: 'social',
+    label: 'YouTube URL',
+  },
+};
+
+for (const [field, config] of Object.entries(settingsMap)) {
+  if (settings[field] !== undefined) {
+    await Settings.findOneAndUpdate(
+      { key: config.key },
+      {
+        value: settings[field],
+        group: config.group,
+        label: config.label,
+      },
+      { upsert: true }
+    );
+  }
+}
+
+if (settings.socialMedia) {
+  for (const [field, config] of Object.entries(socialMediaMap)) {
+    await Settings.findOneAndUpdate(
+      { key: config.key },
+      {
+        value: settings.socialMedia[field] || '',
+        group: config.group,
+        label: config.label,
+      },
+      { upsert: true }
+    );
+  }
+}
 
     await createAuditLog({
-      user: req.user, action: 'settings_update', entity: 'settings',
-      entityId: req.user._id, entityName: 'Platform Settings',
-      description: 'Updated platform settings', req,
+      user: req.user,
+      action: 'settings_update',
+      entity: 'settings',
+      entityId: req.user._id,
+      entityName: 'Platform Settings',
+      description: 'Updated platform settings',
+      req,
     });
 
     return response.success(res, {}, 'Settings updated');
-  } catch (error) { next(error); }
+  } catch (error) {
+    next(error);
+  }
 };
 
 // ==================== AUDIT LOGS ====================
@@ -831,3 +1000,81 @@ exports.getAuditLogs = async (req, res, next) => {
     return response.success(res, { data: result.data, pagination: result.pagination });
   } catch (error) { next(error); }
 };
+
+// ==================== NEWSLETTER SUBSCRIBERS ====================
+
+exports.getNewsletterSubscribers = async (req, res, next) => {
+  try {
+    const { search, status, page, limit } = req.query;
+    const filter = {};
+    if (search) filter.email = new RegExp(search, 'i');
+    if (status === 'active') filter.isActive = true;
+    if (status === 'unsubscribed') filter.isActive = false;
+
+    const query = NewsletterSubscriber.find(filter);
+    const result = await paginate(query, { page, limit, sort: { createdAt: -1 } });
+    return response.success(res, { data: result.data, pagination: result.pagination });
+  } catch (error) { next(error); }
+};
+
+exports.deleteNewsletterSubscriber = async (req, res, next) => {
+  try {
+    const subscriber = await NewsletterSubscriber.findByIdAndDelete(req.params.id);
+    if (!subscriber) return response.notFound(res, 'Subscriber');
+    return response.success(res, {}, 'Subscriber removed');
+  } catch (error) { next(error); }
+};
+
+exports.toggleNewsletterSubscriber = async (req, res, next) => {
+  try {
+    const subscriber = await NewsletterSubscriber.findById(req.params.id);
+    if (!subscriber) return response.notFound(res, 'Subscriber');
+    subscriber.isActive = !subscriber.isActive;
+    subscriber.unsubscribedAt = subscriber.isActive ? null : new Date();
+    await subscriber.save();
+    return response.success(res, { data: subscriber }, `Subscriber ${subscriber.isActive ? 'reactivated' : 'unsubscribed'}`);
+  } catch (error) { next(error); }
+};
+
+// ==================== ENQUIRIES ====================
+
+exports.getEnquiries = async (req, res, next) => {
+  try {
+    const { search, isRead, page, limit } = req.query;
+    const filter = {};
+    if (search) {
+      filter.$or = [
+        { name: new RegExp(search, 'i') },
+        { email: new RegExp(search, 'i') },
+        { subject: new RegExp(search, 'i') }
+      ];
+    }
+    if (isRead !== undefined && isRead !== '') {
+      filter.isRead = isRead === 'true';
+    }
+
+    const query = Enquiry.find(filter);
+    const result = await paginate(query, { page, limit, sort: { createdAt: -1 } });
+    return response.success(res, { data: result.data, pagination: result.pagination });
+  } catch (error) { next(error); }
+};
+
+exports.deleteEnquiry = async (req, res, next) => {
+  try {
+    const enquiry = await Enquiry.findByIdAndDelete(req.params.id);
+    if (!enquiry) return response.notFound(res, 'Enquiry');
+    return response.success(res, {}, 'Enquiry deleted successfully');
+  } catch (error) { next(error); }
+};
+
+exports.toggleEnquiryRead = async (req, res, next) => {
+  try {
+    const enquiry = await Enquiry.findById(req.params.id);
+    if (!enquiry) return response.notFound(res, 'Enquiry');
+    enquiry.isRead = !enquiry.isRead;
+    await enquiry.save();
+    return response.success(res, { data: enquiry }, `Enquiry marked as ${enquiry.isRead ? 'read' : 'unread'}`);
+  } catch (error) { next(error); }
+};
+
+

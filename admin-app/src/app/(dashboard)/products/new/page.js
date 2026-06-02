@@ -28,7 +28,7 @@ export default function NewProductPage() {
   const [form, setForm] = useState({
     name: '', description: '', shortDescription: '', ingredients: '',
     category: '', gstPercentage: 18, hsnCode: '', status: 'active',
-    isFeatured: false, isBestSeller: false, isNewArrival: false,
+    isFeatured: false, isBestSeller: false, showInBestSellers: false, isNewArrival: false,
     tags: '', sortOrder: 0,
     seoTitle: '', seoDescription: '', seoKeywords: '',
     specifications: [],
@@ -201,6 +201,20 @@ export default function NewProductPage() {
                   <label className="block text-sm font-medium mb-1">Sort Order</label>
                   <input type="number" className="admin-input" value={form.sortOrder}
                     onChange={e => setField('sortOrder', e.target.value)} />
+                </div>
+              </div>
+            </div>
+
+            <div className="admin-card space-y-5">
+              <h3 className="font-semibold text-charcoal-900">Best Seller Section</h3>
+              <div className="grid md:grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-sm font-medium mb-1">Show in Best Sellers</label>
+                  <select className="admin-input" value={form.showInBestSellers ? 'true' : 'false'}
+                    onChange={e => setField('showInBestSellers', e.target.value === 'true')}>
+                    <option value="false">No</option>
+                    <option value="true">Yes</option>
+                  </select>
                 </div>
               </div>
             </div>

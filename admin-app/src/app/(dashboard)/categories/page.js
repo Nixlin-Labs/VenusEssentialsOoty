@@ -12,7 +12,7 @@ export default function AdminCategoriesPage() {
   const [editingId, setEditingId] = useState(null);
   const [formData, setFormData] = useState({ name: '', description: '', sortOrder: 0, isActive: true, isHomeView: false, homeViewOption: '0', image: null, existingImage: null });
   const { openViewer } = useFileViewerStore();
-  const getImageUrl = (url) => url ? `${process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || 'http://localhost:5000'}${url}` : '';
+  const getImageUrl = (url) => url ? `${process.env.NEXT_PUBLIC_API_URL?.replace('/api', url)}` : '';
 
   const fetchCategories = async () => {
     try {

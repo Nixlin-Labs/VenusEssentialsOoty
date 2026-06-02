@@ -108,4 +108,14 @@ router.put('/settings', rbac('settings:edit'), adminController.updateSettings);
 // ==================== AUDIT LOGS ====================
 router.get('/audit-logs', adminController.getAuditLogs);
 
+// ==================== NEWSLETTER SUBSCRIBERS ====================
+router.get('/newsletter/subscribers', adminController.getNewsletterSubscribers);
+router.put('/newsletter/subscribers/:id/toggle', adminController.toggleNewsletterSubscriber);
+router.delete('/newsletter/subscribers/:id', adminController.deleteNewsletterSubscriber);
+
+// ==================== ENQUIRIES ====================
+router.get('/enquiries', adminController.getEnquiries);
+router.put('/enquiries/:id/read', adminController.toggleEnquiryRead);
+router.delete('/enquiries/:id', adminController.deleteEnquiry);
+
 module.exports = router;

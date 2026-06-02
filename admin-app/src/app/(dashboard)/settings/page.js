@@ -6,7 +6,7 @@ import adminApi from '@/lib/api';
 
 export default function AdminSettingsPage() {
   const [settings, setSettings] = useState({
-    storeName: 'Venus Essentials', storeEmail: '', storePhone: '',
+    storeName: 'Venus Essentials', storeEmail: '', storePhone: '', whatsapp: '', storeAddress: '',
     gstNumber: '', shippingFreeAbove: 500, shippingCharge: 50,
     gstPercentage: 18, currency: 'INR',
     socialMedia: { instagram: '', facebook: '', youtube: '' },
@@ -40,9 +40,18 @@ export default function AdminSettingsPage() {
         <h3 className="text-base font-semibold text-charcoal-900">Store Information</h3>
         <div className="grid md:grid-cols-2 gap-4">
           <div><label className="block text-sm font-medium mb-1">Store Name</label><input type="text" className="admin-input" value={settings.storeName} onChange={(e) => setSettings({ ...settings, storeName: e.target.value })} /></div>
-          <div><label className="block text-sm font-medium mb-1">Store Email</label><input type="email" className="admin-input" value={settings.storeEmail} onChange={(e) => setSettings({ ...settings, storeEmail: e.target.value })} /></div>
-          <div><label className="block text-sm font-medium mb-1">Store Phone</label><input type="tel" className="admin-input" value={settings.storePhone} onChange={(e) => setSettings({ ...settings, storePhone: e.target.value })} /></div>
           <div><label className="block text-sm font-medium mb-1">GST Number</label><input type="text" className="admin-input" value={settings.gstNumber} onChange={(e) => setSettings({ ...settings, gstNumber: e.target.value })} /></div>
+        </div>
+      </div>
+
+      {/* Contact Info */}
+      <div className="admin-card space-y-4">
+        <h3 className="text-base font-semibold text-charcoal-900">Contact Information</h3>
+        <div className="grid md:grid-cols-2 gap-4">
+          <div><label className="block text-sm font-medium mb-1">Support Email</label><input type="email" className="admin-input" value={settings.storeEmail} onChange={(e) => setSettings({ ...settings, storeEmail: e.target.value })} /></div>
+          <div><label className="block text-sm font-medium mb-1">Support Phone</label><input type="tel" className="admin-input" value={settings.storePhone} onChange={(e) => setSettings({ ...settings, storePhone: e.target.value })} /></div>
+          <div><label className="block text-sm font-medium mb-1">WhatsApp Number</label><input type="tel" className="admin-input" value={settings.whatsapp || ''} onChange={(e) => setSettings({ ...settings, whatsapp: e.target.value })} placeholder="e.g. +919876543210" /></div>
+          <div className="md:col-span-2"><label className="block text-sm font-medium mb-1">Physical Address</label><textarea rows="3" className="admin-input" value={settings.storeAddress || ''} onChange={(e) => setSettings({ ...settings, storeAddress: e.target.value })} /></div>
         </div>
       </div>
 

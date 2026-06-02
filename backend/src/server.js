@@ -25,6 +25,7 @@ const addressRoutes = require('./routes/address.routes');
 const wishlistRoutes = require('./routes/wishlist.routes');
 const cmsRoutes = require('./routes/cms.routes');
 const adminRoutes = require('./routes/admin.routes');
+const newsletterRoutes = require('./routes/newsletter.routes');
 
 const app = express();
 
@@ -56,6 +57,9 @@ app.use('/api/addresses', addressRoutes);
 app.use('/api/wishlist', wishlistRoutes);
 app.use('/api/cms', cmsRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/newsletter', newsletterRoutes);
+app.use('/api/enquiries', require('./routes/enquiry.routes'));
+app.use('/api/settings', require('./routes/settings.routes'));
 
 // --- Health check ---
 app.get('/api/health', (req, res) => {

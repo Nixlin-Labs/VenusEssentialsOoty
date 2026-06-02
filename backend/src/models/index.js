@@ -15,6 +15,8 @@ const Banner = require('./Banner');
 const AuditLog = require('./AuditLog');
 const Notification = require('./Notification');
 const Settings = require('./Settings');
+const NewsletterSubscriber = require('./NewsletterSubscriber');
+const Enquiry = require('./Enquiry');
 
 module.exports = {
   User,
@@ -33,4 +35,6 @@ module.exports = {
   AuditLog,
   Notification,
   Settings,
+  NewsletterSubscriber,
+  Enquiry,
 };
