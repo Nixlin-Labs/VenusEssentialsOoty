@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import adminApi from '@/lib/api';
 import useFileViewerStore from '@/store/useFileViewerStore';
+import useConfirmStore from '@/store/useConfirmStore';
 
 export default function AdminCategoriesPage() {
   const [categories, setCategories] = useState([]);
@@ -12,6 +13,7 @@ export default function AdminCategoriesPage() {
   const [editingId, setEditingId] = useState(null);
   const [formData, setFormData] = useState({ name: '', description: '', sortOrder: 0, isActive: true, isHomeView: false, homeViewOption: '0', image: null, existingImage: null });
   const { openViewer } = useFileViewerStore();
+  const confirm = useConfirmStore((state) => state.confirm);
   const getImageUrl = (url) => url ? `${process.env.NEXT_PUBLIC_API_URL?.replace('/api', url)}` : '';
 
   const fetchCategories = async () => {
@@ -55,7 +57,14 @@ export default function AdminCategoriesPage() {
   };
 
   const handleDelete = async (id) => {
-    if (!confirm('Delete this category?')) return;
+    const confirmed = await confirm({
+      title: 'Delete Category',
+      message: 'Are you sure you want to delete this category permanently?',
+      confirmText: 'Delete',
+      cancelText: 'Cancel',
+      type: 'danger',
+    });
+    if (!confirmed) return;
     try { await adminApi.delete(`/admin/categories/${id}`); toast.success('Category deleted'); fetchCategories(); }
     catch (error) { toast.error(error.response?.data?.message || 'Delete failed'); }
   };

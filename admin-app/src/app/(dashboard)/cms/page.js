@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import adminApi from '@/lib/api';
+import useConfirmStore from '@/store/useConfirmStore';
 
 export default function AdminCmsPage() {
   const [pages, setPages] = useState([]);
@@ -10,6 +11,7 @@ export default function AdminCmsPage() {
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [formData, setFormData] = useState({ title: '', slug: '', content: '', isActive: true });
+  const confirm = useConfirmStore((state) => state.confirm);
 
   const fetchPages = async () => {
     try { const { data } = await adminApi.get('/admin/cms/pages'); setPages(data.data || []); }
@@ -32,7 +34,14 @@ export default function AdminCmsPage() {
   const handleEdit = (p) => { setFormData({ title: p.title, slug: p.slug, content: p.content, isActive: p.isActive }); setEditingId(p._id); setShowForm(true); };
 
   const handleDelete = async (id) => {
-    if (!confirm('Delete this page?')) return;
+    const confirmed = await confirm({
+      title: 'Delete Page',
+      message: 'Are you sure you want to delete this static page permanently?',
+      confirmText: 'Delete',
+      cancelText: 'Cancel',
+      type: 'danger',
+    });
+    if (!confirmed) return;
     try { await adminApi.delete(`/admin/cms/pages/${id}`); toast.success('Deleted'); fetchPages(); } catch { toast.error('Failed'); }
   };
 

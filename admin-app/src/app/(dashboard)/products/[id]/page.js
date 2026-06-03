@@ -6,6 +6,7 @@ import { useRouter, useParams } from 'next/navigation';
 import { toast } from 'sonner';
 import adminApi from '@/lib/api';
 import useFileViewerStore from '@/store/useFileViewerStore';
+import useConfirmStore from '@/store/useConfirmStore';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || 'http://localhost:5000';
 const getImgUrl = (url) => (url ? `${API_BASE}${url}` : '');
@@ -21,6 +22,7 @@ export default function ProductFormPage() {
   const params = useParams();
   const isEdit = params?.id && params.id !== 'new';
   const { openViewer } = useFileViewerStore();
+  const confirm = useConfirmStore((state) => state.confirm);
 
   // ---- Core form state ----
   const [saving, setSaving] = useState(false);
@@ -117,7 +119,14 @@ export default function ProductFormPage() {
 
   // Delete saved variant
   const deleteSavedVariant = async (variantId) => {
-    if (!confirm('Deactivate this variant?')) return;
+    const confirmed = await confirm({
+      title: 'Deactivate Variant',
+      message: 'Are you sure you want to deactivate this variant?',
+      confirmText: 'Deactivate',
+      cancelText: 'Cancel',
+      type: 'warning',
+    });
+    if (!confirmed) return;
     try {
       await adminApi.delete(`/admin/variants/${variantId}`);
       setSavedVariants(prev => prev.filter(v => v._id !== variantId));

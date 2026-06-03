@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { toast } from 'sonner';
 import adminApi from '@/lib/api';
+import useConfirmStore from '@/store/useConfirmStore';
 
 export default function EnquiriesPage() {
   const [enquiries, setEnquiries] = useState([]);
@@ -12,6 +13,7 @@ export default function EnquiriesPage() {
   const [pagination, setPagination] = useState({ page: 1, totalPages: 1, total: 0 });
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedEnquiry, setSelectedEnquiry] = useState(null);
+  const confirm = useConfirmStore((state) => state.confirm);
 
   const fetchEnquiries = useCallback(async () => {
     setLoading(true);
@@ -49,7 +51,14 @@ export default function EnquiriesPage() {
 
   const handleDelete = async (id, e) => {
     if (e) e.stopPropagation();
-    if (!confirm('Permanently delete this enquiry?')) return;
+    const confirmed = await confirm({
+      title: 'Delete Enquiry',
+      message: 'Are you sure you want to permanently delete this enquiry?',
+      confirmText: 'Delete',
+      cancelText: 'Cancel',
+      type: 'danger',
+    });
+    if (!confirmed) return;
     try {
       await adminApi.delete(`/admin/enquiries/${id}`);
       toast.success('Enquiry deleted');

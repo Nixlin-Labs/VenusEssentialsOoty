@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import adminApi from '@/lib/api';
+import useConfirmStore from '@/store/useConfirmStore';
 
 export default function AdminCouponsPage() {
   const [coupons, setCoupons] = useState([]);
@@ -13,6 +14,7 @@ export default function AdminCouponsPage() {
     code: '', discountType: 'percentage', discountValue: '', minOrderAmount: '', maxDiscount: '',
     validFrom: '', validUntil: '', maxUsage: '', isActive: true,
   });
+  const confirm = useConfirmStore((state) => state.confirm);
 
   const fetchCoupons = async () => {
     try { const { data } = await adminApi.get('/admin/coupons'); setCoupons(data.data || []); }
@@ -47,7 +49,14 @@ export default function AdminCouponsPage() {
   };
 
   const handleDelete = async (id) => {
-    if (!confirm('Delete this coupon?')) return;
+    const confirmed = await confirm({
+      title: 'Delete Coupon',
+      message: 'Are you sure you want to delete this coupon permanently?',
+      confirmText: 'Delete',
+      cancelText: 'Cancel',
+      type: 'danger',
+    });
+    if (!confirmed) return;
     try { await adminApi.delete(`/admin/coupons/${id}`); toast.success('Coupon deleted'); fetchCoupons(); }
     catch { toast.error('Delete failed'); }
   };
