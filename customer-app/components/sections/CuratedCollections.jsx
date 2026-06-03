@@ -38,15 +38,23 @@ export default function CuratedCollections() {
     return (
       <section className="section-spacing">
         <div className="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop">
-          <div className="text-center mb-section-gap-mobile">
+          <div className="text-center mb-section-gap-mobile animate-pulse">
             <h2 className="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-primary mb-stack-sm">
               Curated Collections
             </h2>
+            <div className="h-4 w-64 bg-neutral-200 mx-auto rounded mt-2" />
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-gutter auto-rows-[250px] md:auto-rows-[300px]">
-            <div className="md:col-span-2 md:row-span-2 rounded-lg bg-surface-container-low animate-pulse" />
-            <div className="rounded-lg bg-surface-container-low animate-pulse" />
-            <div className="rounded-lg bg-surface-container-low animate-pulse" />
+            <div className="md:col-span-2 md:row-span-2 rounded-lg bg-neutral-200/60 animate-pulse relative p-8 flex flex-col justify-end">
+              <div className="h-6 w-1/3 bg-neutral-300 rounded mb-2" />
+              <div className="h-4 w-1/4 bg-neutral-300 rounded" />
+            </div>
+            <div className="rounded-lg bg-neutral-200/60 animate-pulse relative p-6 flex flex-col justify-end">
+              <div className="h-5 w-1/2 bg-neutral-300 rounded" />
+            </div>
+            <div className="rounded-lg bg-neutral-200/60 animate-pulse relative p-6 flex flex-col justify-end">
+              <div className="h-5 w-1/2 bg-neutral-300 rounded" />
+            </div>
           </div>
         </div>
       </section>

@@ -109,8 +109,22 @@ export default function Testimonials() {
         {/* Testimonial card */}
         <div className="max-w-2xl mx-auto">
           {loading ? (
-            <div className="text-center py-12">
-              <div className="inline-block w-8 h-8 border-2 border-sand/30 border-t-sand rounded-full animate-spin" />
+            <div className="text-center animate-pulse py-6">
+              <div className="flex justify-center mb-6 opacity-30">{QUOTE_ICON}</div>
+              <div className="flex justify-center gap-1.5 mb-6">
+                {[...Array(5)].map((_, i) => (
+                  <div key={i} className="w-4 h-4 bg-white/15 rounded-full" />
+                ))}
+              </div>
+              <div className="space-y-3 flex flex-col items-center">
+                <div className="h-5 w-5/6 bg-white/15 rounded" />
+                <div className="h-5 w-4/6 bg-white/15 rounded" />
+                <div className="h-5 w-2/3 bg-white/15 rounded" />
+              </div>
+              <div className="mt-8 flex flex-col items-center gap-2">
+                <div className="h-4 w-24 bg-white/15 rounded" />
+                <div className="h-3.5 w-16 bg-white/15 rounded" />
+              </div>
             </div>
           ) : (
             <>

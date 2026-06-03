@@ -17,6 +17,8 @@ export default function CheckoutPaymentPage() {
   const router = useRouter();
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState('');
+  const [showMockModal, setShowMockModal] = useState(false);
+  const [mockOrderData, setMockOrderData] = useState(null);
   
   const user = useAuthStore((state) => state.user);
   const addresses = useAuthStore((state) => state.addresses);
@@ -94,24 +96,29 @@ export default function CheckoutPaymentPage() {
       const { data } = await api.post('/payments/create-order', payload);
       const order = data.data;
 
+      if (order.keyId === 'rzp_test_mockkey') {
+        setMockOrderData(order);
+        setShowMockModal(true);
+        return;
+      }
+
       const options = {
-        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
-        amount: order.razorpayOrder.amount,
+        key: order.keyId || process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+        amount: Math.round(order.amount * 100),
         currency: 'INR',
         name: 'Venus Essentials',
         description: `Order ${order.orderNumber}`,
-        order_id: order.razorpayOrder.id,
+        order_id: order.razorpayOrderId,
         handler: async function (response) {
           try {
             await api.post('/payments/verify', {
-              orderId: order._id,
               razorpay_payment_id: response.razorpay_payment_id,
               razorpay_order_id: response.razorpay_order_id,
               razorpay_signature: response.razorpay_signature,
             });
             clearCart();
             toast.success('Order placed successfully!');
-            router.push(`/order-success?id=${order._id}`);
+            router.push(`/order-success?id=${order.orderId}`);
           } catch (error) {
             toast.error('Payment verification failed');
             setIsProcessing(false);
@@ -143,6 +150,49 @@ export default function CheckoutPaymentPage() {
       setError(err.response?.data?.message || err.message || 'Payment initiation failed');
       console.log(err.response);
       
+      setIsProcessing(false);
+    }
+  };
+
+  const handleMockSuccess = async () => {
+    if (!mockOrderData) return;
+    setShowMockModal(false);
+    setIsProcessing(true);
+    setError('');
+    try {
+      const mockPaymentId = `pay_mock_${Math.random().toString(36).substring(2, 10)}`;
+      await api.post('/payments/verify', {
+        razorpay_payment_id: mockPaymentId,
+        razorpay_order_id: mockOrderData.razorpayOrderId,
+        razorpay_signature: 'mock_signature_abc123',
+      });
+      clearCart();
+      toast.success('Simulated payment successful!');
+      router.push(`/order-success?id=${mockOrderData.orderId}`);
+    } catch (error) {
+      toast.error('Payment verification failed');
+      setIsProcessing(false);
+    }
+  };
+
+  const handleMockFailure = async () => {
+    if (!mockOrderData) return;
+    setShowMockModal(false);
+    setIsProcessing(true);
+    setError('');
+    try {
+      await api.post('/payments/failed', {
+        razorpay_order_id: mockOrderData.razorpayOrderId,
+        error: {
+          code: 'BAD_REQUEST_ERROR',
+          description: 'Simulated payment failure',
+        },
+      });
+      setError('Simulated payment failed.');
+      toast.error('Payment failed');
+    } catch (error) {
+      console.error(error);
+    } finally {
       setIsProcessing(false);
     }
   };
@@ -272,6 +322,67 @@ export default function CheckoutPaymentPage() {
         </div>
       </div>
       <Footer />
+      {showMockModal && mockOrderData && (
+        <>
+          <div className="fixed inset-0 z-[100] bg-black/55 backdrop-blur-sm" />
+          <div className="fixed inset-0 z-[101] flex items-center justify-center p-4">
+            <div className="w-full max-w-md overflow-hidden rounded-xl border border-[#e4e2dd] bg-[#faf8f5] shadow-2xl animate-in fade-in zoom-in-95 duration-200">
+              {/* Header */}
+              <div className="bg-primary-container px-6 py-5 text-white">
+                <h3 className="font-display text-lg font-semibold tracking-wide">Venus Essentials</h3>
+                <p className="font-body text-xs text-[#d1dcd5] mt-1">Simulated Razorpay Payment Gateway</p>
+              </div>
+              
+              {/* Body */}
+              <div className="p-6">
+                <div className="text-center mb-6">
+                  <p className="font-body text-xs text-[#727973] uppercase tracking-wider">Transaction Amount</p>
+                  <p className="font-display text-3xl font-bold text-charcoal mt-1">
+                    ₹{mockOrderData.amount?.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </p>
+                  <div className="mt-3 inline-block rounded bg-amber-50 border border-amber-200 px-3 py-1.5 text-left">
+                    <p className="font-body text-[11px] text-amber-800 leading-normal">
+                      <strong>Developer Notice:</strong> Razorpay API keys are not configured or set to default placeholders. Using mock billing mode.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="space-y-2.5 text-xs text-charcoal bg-white p-4 rounded-lg border border-[#e4e2dd] mb-6">
+                  <div className="flex justify-between">
+                    <span className="text-[#727973]">Order Reference:</span>
+                    <span className="font-semibold">{mockOrderData.orderNumber}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-[#727973]">Simulated Gateway:</span>
+                    <span className="font-mono text-[11px]">{mockOrderData.keyId}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-[#727973]">Mock Order ID:</span>
+                    <span className="font-mono text-[11px] break-all">{mockOrderData.razorpayOrderId}</span>
+                  </div>
+                </div>
+
+                <div className="flex flex-col gap-3">
+                  <button
+                    type="button"
+                    onClick={handleMockSuccess}
+                    className="w-full rounded-md bg-primary-container py-3 font-body text-sm font-medium text-white shadow-sm hover:bg-secondary transition-all"
+                  >
+                    Authorize Payment (Success)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleMockFailure}
+                    className="w-full rounded-md border border-[#e4e2dd] bg-white py-3 font-body text-sm font-medium text-red-600 hover:bg-red-50 transition-all"
+                  >
+                    Decline Payment (Fail)
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
     </ProtectedRoute>
   );
 }

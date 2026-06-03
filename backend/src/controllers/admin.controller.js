@@ -1123,3 +1123,42 @@ exports.toggleTestimonialStatus = async (req, res, next) => {
     return response.success(res, { data: testimonial }, `Testimonial ${testimonial.isActive ? 'activated' : 'deactivated'}`);
   } catch (error) { next(error); }
 };
+
+exports.getPayments = async (req, res, next) => {
+  try {
+    const { status, search, page, limit } = req.query;
+    const filter = {};
+    if (status) filter.status = status;
+
+    let query = Payment.find(filter)
+      .populate({
+        path: 'order',
+        select: 'orderNumber user total orderStatus createdAt guestName guestEmail guestPhone',
+        populate: {
+          path: 'user',
+          select: 'name email phone mobile'
+        }
+      });
+
+    if (search) {
+      filter.$or = [
+        { razorpayOrderId: new RegExp(search, 'i') },
+        { razorpayPaymentId: new RegExp(search, 'i') },
+        { status: new RegExp(search, 'i') },
+        { method: new RegExp(search, 'i') }
+      ];
+      query = Payment.find(filter)
+        .populate({
+          path: 'order',
+          select: 'orderNumber user total orderStatus createdAt guestName guestEmail guestPhone',
+          populate: {
+            path: 'user',
+            select: 'name email phone mobile'
+          }
+        });
+    }
+
+    const result = await paginate(query, { page, limit, sort: { createdAt: -1 } });
+    return response.success(res, { data: result.data, pagination: result.pagination });
+  } catch (error) { next(error); }
+};

@@ -25,7 +25,8 @@ import {
   FiChevronLeft,
   FiChevronRight,
   FiLogOut,
-  FiDownload
+  FiDownload,
+  FiCreditCard
 } from 'react-icons/fi';
 
 const menuItems = [
@@ -34,6 +35,7 @@ const menuItems = [
   { href: '/categories', label: 'Categories', icon: <FiFolder /> },
   { href: '/inventory', label: 'Inventory', icon: <FiLayers /> },
   { href: '/orders', label: 'Orders', icon: <FiShoppingCart /> },
+  { href: '/payments', label: 'Payments', icon: <FiCreditCard /> },
   { href: '/customers', label: 'Customers', icon: <FiUsers /> },
   { href: '/coupons', label: 'Coupons', icon: <FiTag /> },
   { href: '/reviews', label: 'Reviews', icon: <FiStar /> },

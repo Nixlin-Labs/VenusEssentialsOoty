@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import ProductCard from '@/components/ui/ProductCard';
+import ProductCard, { ProductCardSkeleton } from '@/components/ui/ProductCard';
 import api from '@/lib/api';
 
 export default function BestSellers() {
@@ -52,10 +52,11 @@ export default function BestSellers() {
           </p>
         </div>
 
-        {/* Product grid */}
         {loading ? (
-          <div className="flex justify-center py-12">
-            <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {[...Array(4)].map((_, idx) => (
+              <ProductCardSkeleton key={idx} variant="default" />
+            ))}
           </div>
         ) : bestSellers.length === 0 ? (
           <p className="text-center text-on-surface-variant py-12">No best sellers available right now.</p>
