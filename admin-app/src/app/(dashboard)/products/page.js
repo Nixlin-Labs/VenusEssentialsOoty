@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { toast } from 'sonner';
 import adminApi from '@/lib/api';
 import useFileViewerStore from '@/store/useFileViewerStore';
+import useConfirmStore from '@/store/useConfirmStore';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || 'http://localhost:5000';
 const getImgUrl = (url) => (url ? `${API_BASE}${url}` : '');
@@ -23,6 +24,7 @@ export default function AdminProductsPage() {
   const [pagination, setPagination] = useState({});
   const [page, setPage] = useState(1);
   const { openViewer } = useFileViewerStore();
+  const confirm = useConfirmStore((state) => state.confirm);
 
   const fetchProducts = async (p = page) => {
     setLoading(true);
@@ -47,7 +49,14 @@ export default function AdminProductsPage() {
   const handleSearch = () => { setPage(1); fetchProducts(1); };
 
   const handleDelete = async (id, name) => {
-    if (!confirm(`Archive product "${name}"? It won't be visible to customers.`)) return;
+    const confirmed = await confirm({
+      title: 'Archive Product',
+      message: `Are you sure you want to archive "${name}"? It won't be visible to customers.`,
+      confirmText: 'Archive',
+      cancelText: 'Cancel',
+      type: 'warning',
+    });
+    if (!confirmed) return;
     try {
       await adminApi.delete(`/admin/products/${id}`);
       toast.success('Product archived');

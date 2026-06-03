@@ -4,39 +4,81 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import useAdminAuthStore from '@/store/useAdminAuthStore';
+import useConfirmStore from '@/store/useConfirmStore';
 import FileViewerModal from '@/components/FileViewerModal';
+import {
+  FiGrid,
+  FiBox,
+  FiFolder,
+  FiLayers,
+  FiShoppingCart,
+  FiUsers,
+  FiTag,
+  FiStar,
+  FiMessageSquare,
+  FiMail,
+  FiMessageCircle,
+  FiFileText,
+  FiImage,
+  FiBarChart2,
+  FiSettings,
+  FiChevronLeft,
+  FiChevronRight,
+  FiLogOut,
+  FiDownload
+} from 'react-icons/fi';
 
 const menuItems = [
-  { href: '/', label: 'Dashboard', icon: '📊' },
-  { href: '/products', label: 'Products', icon: '📦' },
-  { href: '/categories', label: 'Categories', icon: '📂' },
-  { href: '/inventory', label: 'Inventory', icon: '🏪' },
-  { href: '/orders', label: 'Orders', icon: '🛒' },
-  { href: '/customers', label: 'Customers', icon: '👥' },
-  { href: '/coupons', label: 'Coupons', icon: '🎟️' },
-  { href: '/reviews', label: 'Reviews', icon: '⭐' },
-  { href: '/testimonials', label: 'Testimonials', icon: '💬' },
-  { href: '/subscribers', label: 'Subscribers', icon: '📧' },
-  { href: '/enquiries', label: 'Enquiries', icon: '📩' },
-  { href: '/cms', label: 'CMS Pages', icon: '📄' },
-  { href: '/banners', label: 'Banners', icon: '🖼️' },
-  { href: '/reports', label: 'Reports', icon: '📈' },
-  { href: '/settings', label: 'Settings', icon: '⚙️' },
+  { href: '/', label: 'Dashboard', icon: <FiGrid /> },
+  { href: '/products', label: 'Products', icon: <FiBox /> },
+  { href: '/categories', label: 'Categories', icon: <FiFolder /> },
+  { href: '/inventory', label: 'Inventory', icon: <FiLayers /> },
+  { href: '/orders', label: 'Orders', icon: <FiShoppingCart /> },
+  { href: '/customers', label: 'Customers', icon: <FiUsers /> },
+  { href: '/coupons', label: 'Coupons', icon: <FiTag /> },
+  { href: '/reviews', label: 'Reviews', icon: <FiStar /> },
+  { href: '/testimonials', label: 'Testimonials', icon: <FiMessageSquare /> },
+  { href: '/subscribers', label: 'Subscribers', icon: <FiMail /> },
+  { href: '/enquiries', label: 'Enquiries', icon: <FiMessageCircle /> },
+  { href: '/cms', label: 'CMS Pages', icon: <FiFileText /> },
+  { href: '/banners', label: 'Banners', icon: <FiImage /> },
+  { href: '/reports', label: 'Reports', icon: <FiBarChart2 /> },
+  { href: '/settings', label: 'Settings', icon: <FiSettings /> },
+  { href: '/example-export', label: 'Demo Exports', icon: <FiDownload /> },
 ];
 
 export default function DashboardLayout({ children }) {
   const { user, isAuthenticated, logout } = useAdminAuthStore();
+  const confirm = useConfirmStore((state) => state.confirm);
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [mounted, setMounted] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
 
   useEffect(() => {
-    if (!isAuthenticated) {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (mounted && !isAuthenticated) {
       router.push('/login');
     }
-  }, [isAuthenticated, router]);
+  }, [mounted, isAuthenticated, router]);
 
-  if (!isAuthenticated) return null;
+  const handleLogout = async () => {
+    const confirmed = await confirm({
+      title: 'Sign Out',
+      message: 'Are you sure you want to sign out of the Venus Admin Panel?',
+      confirmText: 'Sign Out',
+      cancelText: 'Cancel',
+      type: 'danger',
+    });
+    if (confirmed) {
+      logout();
+    }
+  };
+
+  if (!mounted || !isAuthenticated) return null;
 
   return (
     <div className="flex min-h-screen bg-background">
@@ -49,8 +91,12 @@ export default function DashboardLayout({ children }) {
               <h1 className="text-lg font-bold text-forest-800" style={{ fontFamily: 'Georgia, serif' }}>Venus Admin</h1>
             </div>
           )}
-          <button onClick={() => setSidebarOpen(!sidebarOpen)} className="admin-btn admin-btn-secondary p-1.5 text-xs">
-            {sidebarOpen ? '◀' : '▶'}
+          <button 
+            onClick={() => setSidebarOpen(!sidebarOpen)} 
+            className="admin-btn admin-btn-secondary p-1.5 cursor-pointer"
+            title={sidebarOpen ? "Collapse Sidebar" : "Expand Sidebar"}
+          >
+            {sidebarOpen ? <FiChevronLeft className="text-sm" /> : <FiChevronRight className="text-sm" />}
           </button>
         </div>
 
@@ -68,7 +114,7 @@ export default function DashboardLayout({ children }) {
                     : 'text-charcoal-500 hover:bg-charcoal-50 hover:text-charcoal-900'
                 }`}
               >
-                <span className="text-base flex-shrink-0">{item.icon}</span>
+                <span className="text-lg flex-shrink-0">{item.icon}</span>
                 {sidebarOpen && <span>{item.label}</span>}
               </Link>
             );
@@ -86,12 +132,22 @@ export default function DashboardLayout({ children }) {
                 <p className="text-sm font-medium text-charcoal-900 truncate">{user?.name}</p>
                 <p className="text-xs text-muted truncate">{user?.role?.replace('_', ' ')}</p>
               </div>
-              <button onClick={logout} className="text-xs text-error hover:text-red-700" title="Logout">
-                ↪
+              <button 
+                onClick={handleLogout} 
+                className="text-lg text-error hover:text-red-700 cursor-pointer p-1 rounded hover:bg-charcoal-50 transition-colors" 
+                title="Logout"
+              >
+                <FiLogOut />
               </button>
             </div>
           ) : (
-            <button onClick={logout} className="w-full flex justify-center text-error" title="Logout">↪</button>
+            <button 
+              onClick={handleLogout} 
+              className="w-full flex justify-center text-lg text-error cursor-pointer p-1 rounded hover:bg-charcoal-50 transition-colors" 
+              title="Logout"
+            >
+              <FiLogOut />
+            </button>
           )}
         </div>
       </aside>

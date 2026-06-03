@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { toast } from 'sonner';
 import adminApi from '@/lib/api';
+import useConfirmStore from '@/store/useConfirmStore';
 
 export default function SubscribersPage() {
   const [subscribers, setSubscribers] = useState([]);
@@ -11,6 +12,7 @@ export default function SubscribersPage() {
   const [status, setStatus] = useState('');
   const [pagination, setPagination] = useState({ page: 1, totalPages: 1, total: 0 });
   const [currentPage, setCurrentPage] = useState(1);
+  const confirm = useConfirmStore((state) => state.confirm);
 
   const fetchSubscribers = useCallback(async () => {
     setLoading(true);
@@ -44,7 +46,14 @@ export default function SubscribersPage() {
   };
 
   const handleDelete = async (id) => {
-    if (!confirm('Permanently delete this subscriber?')) return;
+    const confirmed = await confirm({
+      title: 'Delete Subscriber',
+      message: 'Are you sure you want to permanently delete this subscriber?',
+      confirmText: 'Delete',
+      cancelText: 'Cancel',
+      type: 'danger',
+    });
+    if (!confirmed) return;
     try {
       await adminApi.delete(`/admin/newsletter/subscribers/${id}`);
       toast.success('Subscriber deleted');

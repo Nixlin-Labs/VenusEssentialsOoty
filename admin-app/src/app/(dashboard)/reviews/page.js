@@ -3,11 +3,13 @@
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import adminApi from '@/lib/api';
+import useConfirmStore from '@/store/useConfirmStore';
 
 export default function AdminReviewsPage() {
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState('');
+  const confirm = useConfirmStore((state) => state.confirm);
 
   const fetchReviews = async () => {
     setLoading(true);
@@ -29,7 +31,14 @@ export default function AdminReviewsPage() {
   };
 
   const handleDelete = async (id) => {
-    if (!confirm('Delete this review permanently?')) return;
+    const confirmed = await confirm({
+      title: 'Delete Review',
+      message: 'Are you sure you want to delete this review permanently?',
+      confirmText: 'Delete',
+      cancelText: 'Cancel',
+      type: 'danger',
+    });
+    if (!confirmed) return;
     try { await adminApi.delete(`/admin/reviews/${id}`); toast.success('Review deleted'); fetchReviews(); }
     catch { toast.error('Delete failed'); }
   };

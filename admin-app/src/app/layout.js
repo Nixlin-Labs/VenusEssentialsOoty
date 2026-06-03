@@ -1,5 +1,6 @@
 import "./globals.css";
 import { Toaster } from 'sonner';
+import ConfirmModal from '@/components/ConfirmModal';
 
 export const metadata = {
   title: "Venus Essentials — Admin Panel",
@@ -12,6 +13,7 @@ export default function AdminRootLayout({ children }) {
       <body>
         {children}
         <Toaster position="top-right" toastOptions={{ duration: 3000 }} />
+        <ConfirmModal />
       </body>
     </html>
   );

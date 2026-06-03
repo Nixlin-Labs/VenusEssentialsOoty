@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import adminApi from '@/lib/api';
+import useConfirmStore from '@/store/useConfirmStore';
 
 export default function AdminBannersPage() {
   const [banners, setBanners] = useState([]);
@@ -11,6 +12,7 @@ export default function AdminBannersPage() {
   const [editingId, setEditingId] = useState(null);
   const [formData, setFormData] = useState({ title: '', subtitle: '', linkUrl: '', position: 'hero', sortOrder: 0, isActive: true });
   const [imageFile, setImageFile] = useState(null);
+  const confirm = useConfirmStore((state) => state.confirm);
 
   const fetchBanners = async () => {
     try { const { data } = await adminApi.get('/admin/banners'); setBanners(data.data || []); }
@@ -36,7 +38,14 @@ export default function AdminBannersPage() {
   const handleEdit = (b) => { setFormData({ title: b.title, subtitle: b.subtitle || '', linkUrl: b.linkUrl || '', position: b.position, sortOrder: b.sortOrder || 0, isActive: b.isActive }); setEditingId(b._id); setShowForm(true); };
 
   const handleDelete = async (id) => {
-    if (!confirm('Delete this banner?')) return;
+    const confirmed = await confirm({
+      title: 'Delete Banner',
+      message: 'Are you sure you want to delete this banner permanently?',
+      confirmText: 'Delete',
+      cancelText: 'Cancel',
+      type: 'danger',
+    });
+    if (!confirmed) return;
     try { await adminApi.delete(`/admin/banners/${id}`); toast.success('Deleted'); fetchBanners(); } catch { toast.error('Failed'); }
   };
 
