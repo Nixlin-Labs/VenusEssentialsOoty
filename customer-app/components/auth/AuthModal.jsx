@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useAuthStore } from '@/lib/authStore';
+import { toast } from "sonner";
+
 
 const initialLogin = { emailOrMobile: '', password: '' };
 const initialRegister = {
@@ -47,31 +49,36 @@ export default function AuthModal() {
   const [registerForm, setRegisterForm] = useState(initialRegister);
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const setL = (key) => (e) => setLoginForm((p) => ({ ...p, [key]: e.target.value }));
   const setR = (key) => (e) => setRegisterForm((p) => ({ ...p, [key]: e.target.value }));
 
   const handleLogin = async (e) => {
+    setLoading(true);
     e.preventDefault();
     const ok = await login(loginForm);
-    if (!ok) setError('Invalid credentials. Please check and try again.');
+    if (!ok) toast.error('Invalid credentials. Please check and try again.');
     else {
-      setError('');
+      toast.success('Login successful');
       setLoginForm(initialLogin);
+      closeAuthModal();
     }
+    setLoading(false);
   };
 
   const handleRegister = async (e) => {
     e.preventDefault();
     if (registerForm.password !== registerForm.confirmPassword) {
-      setError('Passwords do not match');
+      toast.error('Passwords do not match');
       return;
     }
     const result = await register(registerForm);
-    if (!result.ok) setError(result.message);
+    if (!result.ok) toast.error(result.message);
     else {
-      setError('');
+      toast.success('Registration successful');
       setRegisterForm(initialRegister);
+      closeAuthModal();
     }
   };
 
@@ -189,18 +196,12 @@ export default function AuthModal() {
                         </button>
                       </div>
 
-                      {error && (
-                        <p className="flex items-center gap-1.5 rounded-lg bg-error-container px-3 py-2.5 font-body text-xs text-error">
-                          <span className="material-symbols-outlined filled" style={{ fontSize: '16px' }}>error</span>
-                          {error}
-                        </p>
-                      )}
 
                       <button
                         type="submit"
                         className="w-full rounded-xl bg-primary-container py-3.5 font-body text-sm font-medium text-white transition-colors hover:bg-secondary"
                       >
-                        Sign In
+                        {loading ? 'Signing In...' : 'Sign In'}
                       </button>
                     </motion.form>
                   ) : (
@@ -254,18 +255,11 @@ export default function AuthModal() {
                         onChange={setR('confirmPassword')}
                       />
 
-                      {error && (
-                        <p className="flex items-center gap-1.5 rounded-lg bg-error-container px-3 py-2.5 font-body text-xs text-error">
-                          <span className="material-symbols-outlined filled" style={{ fontSize: '16px' }}>error</span>
-                          {error}
-                        </p>
-                      )}
-
                       <button
                         type="submit"
                         className="w-full rounded-xl bg-primary-container py-3.5 font-body text-sm font-medium text-white transition-colors hover:bg-secondary"
                       >
-                        Create Account
+                        {loading ? 'Creating Account...' : 'Create Account'}
                       </button>
                     </motion.form>
                   )}
@@ -279,7 +273,7 @@ export default function AuthModal() {
                   Secure &amp; encrypted. Your data stays private.
                 </p> */}
                 {authMode === 'login' && (
-                  <p className="mt-5 text-center font-body text-xs text-outline">Don't have an account? <button className="text-secondary" onClick={() => switchMode('register')}>Register</button></p>
+                  <p className="mt-5 text-center font-body text-xs text-outline">Don&apos;t have an account? <button className="text-secondary" onClick={() => switchMode('register')}>Register</button></p>
                 )}
                 {authMode === 'register' && (
                   <p className="mt-5 text-center font-body text-xs text-outline">Already have an account? <button className="text-secondary" onClick={() => switchMode('login')}>Login</button></p>

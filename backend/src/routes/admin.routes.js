@@ -59,6 +59,9 @@ router.get('/orders/:id', rbac('order:view'), adminController.getOrderById);
 router.put('/orders/:id/status', rbac('order:update'), adminController.updateOrderStatus);
 router.post('/orders/:id/refund', rbac('order:refund'), adminController.processRefund);
 
+// ==================== PAYMENTS ====================
+router.get('/payments', rbac('order:view'), adminController.getPayments);
+
 // ==================== CUSTOMERS ====================
 router.get('/customers', rbac('customer:view'), adminController.getCustomers);
 router.get('/customers/:id', rbac('customer:view'), adminController.getCustomerById);

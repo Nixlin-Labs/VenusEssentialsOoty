@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/lib/authStore';
 
-export default function ProtectedRoute({ children }) {
+export default function ProtectedRoute({ children, fallback = null }) {
   const router = useRouter();
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const hasHydrated = useAuthStore((state) => state.hasHydrated);
@@ -18,6 +18,7 @@ export default function ProtectedRoute({ children }) {
   }, [hasHydrated, isAuthenticated, openAuthModal, router]);
 
   if (!hasHydrated) {
+    if (fallback) return fallback;
     return (
       <div className="flex min-h-screen items-center justify-center bg-surface">
         <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />

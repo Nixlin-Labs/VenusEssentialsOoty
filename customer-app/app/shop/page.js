@@ -5,7 +5,7 @@ import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
-import ProductCard from '@/components/ui/ProductCard';
+import ProductCard, { ProductCardSkeleton } from '@/components/ui/ProductCard';
 import api from '@/lib/api';
 
 function FilterContent({
@@ -362,10 +362,11 @@ function ShopPageContent() {
               </span>
             </div>
 
-            {/* Grid */}
             {loading ? (
-              <div className="flex justify-center py-24">
-                <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-x-6 gap-y-12">
+                {[...Array(6)].map((_, idx) => (
+                  <ProductCardSkeleton key={idx} variant="default" />
+                ))}
               </div>
             ) : products.length === 0 ? (
               <div className="text-center py-20 bg-surface-container-low/50 rounded-2xl border border-dashed border-outline-variant p-8">
@@ -490,15 +491,56 @@ function ShopPageContent() {
   );
 }
 
+function ShopPageSkeleton() {
+  return (
+    <>
+      <Navbar activeLink="Shop All" />
+      <main className="bg-background text-on-background font-body antialiased overflow-x-hidden min-h-screen">
+        {/* Page Header */}
+        <header className="pt-32 pb-16 md:pt-40 md:pb-24 px-5 md:px-16 text-center animate-pulse">
+          <div className="max-w-3xl mx-auto">
+            <div className="h-12 w-64 bg-neutral-200 mx-auto rounded mb-6" />
+            <div className="h-4 w-96 bg-neutral-200 mx-auto rounded" />
+          </div>
+        </header>
+
+        {/* Main Content: Sidebar + Grid */}
+        <div className="max-w-[1280px] mx-auto px-5 md:px-16 pb-24 flex flex-col lg:flex-row gap-8">
+          {/* Desktop Filter Sidebar */}
+          <div className="hidden lg:block w-72 shrink-0 h-[500px] bg-neutral-100 rounded-3xl border border-outline-variant/30 animate-pulse" />
+
+          {/* Product Grid Area */}
+          <div className="flex-grow">
+            {/* Toolbar */}
+            <div className="h-10 w-full border-b border-outline-variant/30 mb-8 animate-pulse" />
+            
+            {/* Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-x-6 gap-y-12">
+              {[...Array(6)].map((_, idx) => (
+                <div key={idx} className="animate-pulse flex flex-col w-full">
+                  <div className="aspect-square bg-neutral-200 rounded-xl mb-4" />
+                  <div className="flex flex-col gap-2">
+                    <div className="h-3 w-16 bg-neutral-200 rounded mb-1" />
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="h-4 w-2/3 bg-neutral-200 rounded" />
+                      <div className="h-4 w-10 bg-neutral-200 rounded" />
+                    </div>
+                    <div className="h-3 w-1/3 bg-neutral-200 rounded mt-1" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </main>
+      <Footer />
+    </>
+  );
+}
+
 export default function ShopPage() {
   return (
-    <Suspense
-      fallback={
-        <div className="min-h-screen bg-background flex items-center justify-center">
-          <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-        </div>
-      }
-    >
+    <Suspense fallback={<ShopPageSkeleton />}>
       <ShopPageContent />
     </Suspense>
   );

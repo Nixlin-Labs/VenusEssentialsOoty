@@ -270,3 +270,31 @@ export default function ProductCard({ product, variant = 'default', index = 0 })
     </motion.article>
   );
 }
+
+export function ProductCardSkeleton({ variant = 'default' }) {
+  if (variant === 'collection') {
+    return (
+      <div className="animate-pulse flex flex-col items-center text-center w-full">
+        <div className="relative mb-5 aspect-[4/5] w-full rounded-xl bg-neutral-200" />
+        <div className="h-3 w-20 bg-neutral-200 rounded mb-3" />
+        <div className="h-5 w-2/3 bg-neutral-200 rounded mb-2" />
+        <div className="h-3 w-1/3 bg-neutral-200 rounded mb-2" />
+        <div className="h-4 w-12 bg-neutral-200 rounded" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="animate-pulse flex flex-col w-full">
+      <div className="relative mb-4 aspect-square rounded-xl bg-neutral-200" />
+      <div className="flex flex-grow flex-col gap-2">
+        <div className="h-3 w-16 bg-neutral-200 rounded mb-1" />
+        <div className="flex items-start justify-between gap-4">
+          <div className="h-4 w-2/3 bg-neutral-200 rounded" />
+          <div className="h-4 w-10 bg-neutral-200 rounded" />
+        </div>
+        <div className="h-3 w-1/3 bg-neutral-200 rounded mt-1" />
+      </div>
+    </div>
+  );
+}

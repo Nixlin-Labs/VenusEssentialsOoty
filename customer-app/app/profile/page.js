@@ -44,8 +44,78 @@ function SectionCard({ title, icon, children }) {
         </div>
         <h2 className="font-display text-2xl text-charcoal">{title}</h2>
       </div>
-      {children}
     </section>
+  );
+}
+function ProfileSkeleton() {
+  return (
+    <>
+      <Navbar />
+      <main className="min-h-screen bg-surface pt-24 animate-pulse">
+        <div className="container-main py-12">
+          {/* Header Shimmer */}
+          <div className="mb-10 flex flex-col gap-2 border-b border-outline-variant pb-8 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <div className="h-3.5 w-16 bg-neutral-200 rounded mb-2" />
+              <div className="h-10 w-48 bg-neutral-200/80 rounded" />
+            </div>
+            <div className="flex items-center gap-6 mt-4 sm:mt-0">
+              <div className="h-5 w-24 bg-neutral-200/80 rounded" />
+              <div className="h-5 w-20 bg-neutral-200/80 rounded" />
+            </div>
+          </div>
+
+          {/* Content Grid Shimmer */}
+          <div className="grid gap-8 lg:grid-cols-[1fr_1.4fr]">
+            {/* Personal Details */}
+            <div className="rounded-2xl border border-outline-variant bg-white p-6 md:p-8 space-y-6">
+              <div className="flex items-center gap-3 border-b border-surface-container pb-5">
+                <div className="h-10 w-10 bg-neutral-200/80 rounded-full" />
+                <div className="h-7 w-40 bg-neutral-200/80 rounded" />
+              </div>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <div className="h-3 w-20 bg-neutral-200 rounded" />
+                  <div className="h-12 w-full bg-neutral-100 rounded-xl" />
+                </div>
+                <div className="space-y-2">
+                  <div className="h-3 w-24 bg-neutral-200 rounded" />
+                  <div className="h-12 w-full bg-neutral-100 rounded-xl" />
+                </div>
+                <div className="space-y-2">
+                  <div className="h-3 w-28 bg-neutral-200 rounded" />
+                  <div className="h-12 w-full bg-neutral-100 rounded-xl" />
+                </div>
+                <div className="h-12 w-32 bg-neutral-200 rounded-xl mt-6" />
+              </div>
+            </div>
+
+            {/* Saved Addresses */}
+            <div className="rounded-2xl border border-outline-variant bg-white p-6 md:p-8 space-y-6">
+              <div className="flex items-center gap-3 border-b border-surface-container pb-5">
+                <div className="h-10 w-10 bg-neutral-200/80 rounded-full" />
+                <div className="h-7 w-40 bg-neutral-200/80 rounded" />
+              </div>
+              <div className="space-y-4">
+                <div className="rounded-xl border border-outline-variant bg-neutral-50 p-5 space-y-3">
+                  <div className="h-5 w-16 bg-neutral-200 rounded-full" />
+                  <div className="h-4 w-32 bg-neutral-200 rounded" />
+                  <div className="h-4 w-24 bg-neutral-200 rounded" />
+                  <div className="h-4 w-2/3 bg-neutral-200 rounded" />
+                </div>
+                <div className="rounded-xl border border-outline-variant bg-neutral-50 p-5 space-y-3">
+                  <div className="h-5 w-16 bg-neutral-200 rounded-full" />
+                  <div className="h-4 w-32 bg-neutral-200 rounded" />
+                  <div className="h-4 w-24 bg-neutral-200 rounded" />
+                  <div className="h-4 w-2/3 bg-neutral-200 rounded" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+      <Footer />
+    </>
   );
 }
 
@@ -159,7 +229,7 @@ export default function ProfilePage() {
   };
 
   return (
-    <ProtectedRoute>
+    <ProtectedRoute fallback={<ProfileSkeleton />}>
       <Navbar />
       <main className="min-h-screen bg-surface pt-24">
         <div className="container-main py-12">

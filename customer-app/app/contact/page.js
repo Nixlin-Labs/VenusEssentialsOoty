@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { motion } from 'framer-motion';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import { useSettingsStore } from '@/lib/settingsStore';
@@ -74,26 +75,49 @@ export default function ContactPage() {
   return (
     <>
       <Navbar activeLink="Contact Us" />
-      <main className="pt-24">
-        <div className="container-main section-gap">
-          <div className="grid gap-12 lg:grid-cols-5 lg:items-start">
-            <div className="lg:col-span-2">
-              <h1 className="font-display text-4xl text-charcoal md:text-[52px]">
-                Get in Touch
-              </h1>
-              <p className="mt-6 font-body text-base leading-[1.8] text-on-surface-variant">
-                Whether you have a question about our artisanal processes, need assistance with
-                an order, or simply want to connect with nature&apos;s essence, we are here for you.
-              </p>
-            </div>
-            <div className="lg:col-span-3">
-              <img
-                src="https://images.unsplash.com/photo-1638886540342-240980f60d25?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D?w=1200&q=80"
-                alt="Nilgiri hills landscape"
-                className="w-full rounded-xl shadow-botanical"
-              />
-            </div>
+      <main className="bg-background text-on-background font-body antialiased overflow-x-hidden min-h-screen">
+        
+        {/* Page Hero */}
+        <header className="relative pt-32 pb-20 md:pt-40 md:pb-28 border-b border-outline-variant/30 text-center px-5 overflow-hidden bg-surface-container-low">
+          {/* Background Image */}
+          <div className="absolute inset-0 z-0">
+            <img
+              src="/images/hero-bg-ooty.png"
+              alt="Misty Ooty Nilgiri Hills"
+              className="object-cover object-center w-full h-full opacity-40 select-none pointer-events-none"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-transparent" />
           </div>
+          
+          <div className="max-w-3xl mx-auto relative z-10">
+            <motion.p 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5 }}
+              className="font-body text-xs font-semibold uppercase tracking-[0.25em] text-sand mb-3"
+            >
+              Get in Touch
+            </motion.p>
+            <motion.h1 
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1, duration: 0.6 }}
+              className="font-display text-4xl md:text-5xl lg:text-6xl text-primary mb-6"
+            >
+              Contact Us
+            </motion.h1>
+            <motion.p 
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2, duration: 0.6 }}
+              className="font-body text-base md:text-lg text-primary-container leading-relaxed max-w-2xl mx-auto font-medium"
+            >
+              Whether you have a question about our artisanal processes, need assistance with an order, or simply want to connect with nature&apos;s essence, we are here for you.
+            </motion.p>
+          </div>
+        </header>
+
+        <div className="container-main py-16">
 
           <div className="grid gap-12 mt-16 lg:grid-cols-5">
             <div className="p-8 bg-white rounded-xl shadow-botanical lg:col-span-3">
