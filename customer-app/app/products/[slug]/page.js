@@ -135,8 +135,8 @@ export default function ProductPage({ params }) {
   const API_URL = process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || 'http://localhost:5000';
   const getImageUrl = (url) => (url ? `${API_URL}${url}` : null);
 
-  const images = product.images && product.images.length > 0 
-    ? product.images.map(i => getImageUrl(i.url)) 
+  const images = product.images && product.images.length > 0
+    ? product.images.map(i => getImageUrl(i.url))
     : ['/placeholder-product.jpg'];
 
   const categorySlug = product.category?.slug || '';
@@ -166,7 +166,7 @@ export default function ProductPage({ params }) {
   return (
     <>
       <Navbar activeLink="Categories" />
-      <main className="pt-24">
+      <main className="pt-20">
         <div className="container-main py-8">
           <Breadcrumb
             items={[
@@ -207,11 +207,10 @@ export default function ProductPage({ params }) {
                       key={i}
                       type="button"
                       onClick={() => setActiveImage(i)}
-                      className={`h-20 w-20 overflow-hidden rounded-lg border-2 transition-all duration-200 ${
-                        activeImage === i
-                          ? 'border-primary-container shadow-md'
-                          : 'border-transparent opacity-60 hover:opacity-100'
-                      }`}
+                      className={`h-20 w-20 overflow-hidden rounded-lg border-2 transition-all duration-200 ${activeImage === i
+                        ? 'border-primary-container shadow-md'
+                        : 'border-transparent opacity-60 hover:opacity-100'
+                        }`}
                     >
                       <img src={img} alt="" className="h-full w-full object-cover" />
                     </button>
@@ -249,9 +248,9 @@ export default function ProductPage({ params }) {
                 In Stock · Handcrafted in small batches
               </p>
 
-              <div 
+              <div
                 className="mt-6 font-body text-[15px] leading-[1.8] text-on-surface-variant"
-                dangerouslySetInnerHTML={{ __html: product.description }} 
+                dangerouslySetInnerHTML={{ __html: product.description }}
               />
 
               {/* Scent Profile (Fallback if available) */}
@@ -279,13 +278,12 @@ export default function ProductPage({ params }) {
                         type="button"
                         onClick={() => setSelectedVariant(variant)}
                         disabled={variant.stock === 0}
-                        className={`rounded-md px-5 py-2 font-body text-sm transition-all duration-200 ${
-                          selectedVariant?._id === variant._id
-                            ? 'border border-charcoal bg-charcoal text-white'
-                            : variant.stock === 0
-                              ? 'border border-outline/20 text-outline cursor-not-allowed opacity-50'
-                              : 'border border-outline-variant text-on-surface-variant hover:border-secondary'
-                        }`}
+                        className={`rounded-md px-5 py-2 font-body text-sm transition-all duration-200 ${selectedVariant?._id === variant._id
+                          ? 'border border-charcoal bg-charcoal text-white'
+                          : variant.stock === 0
+                            ? 'border border-outline/20 text-outline cursor-not-allowed opacity-50'
+                            : 'border border-outline-variant text-on-surface-variant hover:border-secondary'
+                          }`}
                       >
                         {variant.name}
                         {variant.weight && (
@@ -310,9 +308,8 @@ export default function ProductPage({ params }) {
                   type="button"
                   onClick={handleAddToBag}
                   disabled={selectedVariant?.stock === 0}
-                  className={`relative flex-1 overflow-hidden rounded-md py-3 font-body text-sm uppercase tracking-wider text-white transition-all duration-300 ${
-                    addedToCart ? 'bg-secondary' : 'bg-primary-container hover:bg-secondary disabled:opacity-50'
-                  }`}
+                  className={`relative flex-1 overflow-hidden rounded-md py-3 font-body text-sm uppercase tracking-wider text-white transition-all duration-300 ${addedToCart ? 'bg-secondary' : 'bg-primary-container hover:bg-secondary disabled:opacity-50'
+                    }`}
                 >
                   <AnimatePresence mode="wait">
                     {addedToCart ? (

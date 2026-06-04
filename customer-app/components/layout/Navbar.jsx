@@ -188,7 +188,7 @@ export default function Navbar({ activeLink }) {
       <motion.header
         className="fixed top-0 left-0 right-0 z-50 transition-shadow duration-300"
         style={{
-          backgroundColor: scrolled ? "rgba(251,249,244,0.98)" : "transparent",
+          backgroundColor: scrolled ? "rgba(251,249,244,100)" : "transparent",
           boxShadow: scrolled ? "0 8px 40px rgba(45,71,57,0.06)" : "none",
         }}
       >
@@ -260,7 +260,7 @@ export default function Navbar({ activeLink }) {
                       exit={{ opacity: 0, y: 8 }}
                       className="absolute right-0 z-50 w-48 p-2 mt-2 border rounded-lg top-full border-outline-variant bg-surface shadow-card"
                     >
-                      <p className="px-2 py-2 mb-1 text-sm font-medium rounded-md text-primary border-b border-outline-variant">
+                      <p className="px-2 py-2 mb-1 text-sm font-medium border-b rounded-md text-primary border-outline-variant">
                         {user?.name || "Profile"}
                       </p>
                       <Link
@@ -392,7 +392,7 @@ export default function Navbar({ activeLink }) {
             {/* Search Header (Matches screenshot: Center brand header with close button next to it) */}
             <div className="flex flex-col items-center pt-6 md:pt-12">
               <div className="flex items-center gap-3 mb-6">
-                <span className="font-display text-2xl md:text-3xl text-charcoal tracking-wide">
+                <span className="text-2xl tracking-wide font-display md:text-3xl text-charcoal">
                   Venus Ooty Essentials
                 </span>
                 <button
@@ -402,7 +402,7 @@ export default function Navbar({ activeLink }) {
                     setSearchQuery("");
                     setSearchResults([]);
                   }}
-                  className="flex h-8 w-8 items-center justify-center rounded-full bg-surface-container hover:bg-surface-high transition-colors shadow-sm"
+                  className="flex items-center justify-center w-8 h-8 transition-colors rounded-full shadow-sm bg-surface-container hover:bg-surface-high"
                   aria-label="Close search"
                 >
                   <span className="material-symbols-outlined text-[18px] text-charcoal">close</span>
@@ -411,7 +411,7 @@ export default function Navbar({ activeLink }) {
             </div>
 
             {/* Search Input Container (Matches screenshot: solid green underline, placeholder, search icon at the right end) */}
-            <div className="w-full max-w-2xl mx-auto px-4">
+            <div className="w-full max-w-2xl px-4 mx-auto">
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
@@ -430,11 +430,11 @@ export default function Navbar({ activeLink }) {
                   placeholder="Search for eucalyptus oil, soaps, skincare..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full py-4 pl-2 pr-12 text-lg md:text-xl bg-transparent border-0 border-b-2 outline-none border-primary font-body text-charcoal placeholder:text-outline-variant focus:border-secondary transition-colors"
+                  className="w-full py-4 pl-2 pr-12 text-lg transition-colors bg-transparent border-0 border-b-2 outline-none md:text-xl border-primary font-body text-charcoal placeholder:text-outline-variant focus:border-secondary"
                 />
                 <button
                   type="submit"
-                  className="absolute -translate-y-1/2 right-2 top-1/2 text-primary hover:text-secondary transition-colors"
+                  className="absolute transition-colors -translate-y-1/2 right-2 top-1/2 text-primary hover:text-secondary"
                 >
                   <span className="material-symbols-outlined text-[22px]">search</span>
                 </button>
@@ -502,10 +502,10 @@ export default function Navbar({ activeLink }) {
                 </p>
                 {searchLoading ? (
                   <div className="flex justify-center py-6">
-                    <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+                    <div className="w-6 h-6 border-2 rounded-full animate-spin border-primary border-t-transparent" />
                   </div>
                 ) : searchResults.length > 0 ? (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     {searchResults.map((p) => {
                       const imgUrl = p.images?.[0]?.url ? getImageUrl(p.images[0].url) : null;
                       const defaultVariant = p.variants?.find(v => v.isDefault) || p.variants?.[0];
@@ -524,13 +524,13 @@ export default function Navbar({ activeLink }) {
                           {imgUrl ? (
                             <img src={imgUrl} alt={p.name} className="object-cover w-12 h-12 rounded-lg shrink-0" />
                           ) : (
-                            <div className="w-12 h-12 rounded-lg bg-surface-container flex items-center justify-center shrink-0">
+                            <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-surface-container shrink-0">
                               <span className="material-symbols-outlined text-outline text-[18px]">spa</span>
                             </div>
                           )}
                           <div className="flex-1 min-w-0">
                             <p className="text-sm font-semibold truncate font-body text-charcoal">{p.name}</p>
-                            <p className="text-xs font-body text-outline truncate">{p.category?.name}</p>
+                            <p className="text-xs truncate font-body text-outline">{p.category?.name}</p>
                             <p className="text-xs font-bold font-body text-secondary mt-0.5">₹{price}</p>
                           </div>
                         </Link>
@@ -538,11 +538,11 @@ export default function Navbar({ activeLink }) {
                     })}
                   </div>
                 ) : searchQuery.trim() !== "" ? (
-                  <p className="text-sm font-body text-outline text-center py-6">
+                  <p className="py-6 text-sm text-center font-body text-outline">
                     No products found for &ldquo;{searchQuery}&rdquo;
                   </p>
                 ) : (
-                  <p className="text-sm font-body text-outline text-center py-6">
+                  <p className="py-6 text-sm text-center font-body text-outline">
                     Start typing to discover Nilgiri wellness treasures.
                   </p>
                 )}

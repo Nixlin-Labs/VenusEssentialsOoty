@@ -18,7 +18,7 @@ export default function CheckoutInformationPage() {
   const addAddress = useAuthStore((state) => state.addAddress);
   const fetchAddresses = useAuthStore((state) => state.fetchAddresses);
   const cartItems = useCart((state) => state.items);
-  
+
   const [useNewAddress, setUseNewAddress] = useState(false);
   const [newAddress, setNewAddress] = useState({
     label: "Home",
@@ -92,7 +92,7 @@ export default function CheckoutInformationPage() {
     <ProtectedRoute>
       <>
         <Navbar />
-        <div className="min-h-screen bg-surface pt-20 md:pt-24">
+        <div className="min-h-screen bg-surface pt-20 md:pt-20">
           <div className="container-main py-8">
             <nav className="mb-8 font-body text-[13px] text-[#727973]">
               <Link href="/" className="hover:text-charcoal">
@@ -108,30 +108,6 @@ export default function CheckoutInformationPage() {
 
             <div className="grid gap-12 lg:grid-cols-[58%_42%]">
               <div>
-                <section className="mb-10">
-                  <div className="mb-6 flex items-center justify-between">
-                    <h2 className="font-display text-2xl text-charcoal">
-                      Contact
-                    </h2>
-                    <p className="font-body text-sm text-[#727973]">
-                      {user?.email}
-                    </p>
-                  </div>
-                  <input
-                    type="text"
-                    defaultValue={user?.email || user?.mobile}
-                    placeholder="Email or mobile phone number"
-                    className="input-field mb-4"
-                  />
-                  <label className="flex items-center gap-2 font-body text-sm text-on-surface-variant">
-                    <input
-                      type="checkbox"
-                      className="rounded border-outline-variant"
-                    />
-                    Email me with news and offers
-                  </label>
-                </section>
-
                 <section className="mb-10">
                   <h2 className="mb-6 font-display text-2xl text-charcoal">
                     Shipping address
@@ -287,11 +263,10 @@ export default function CheckoutInformationPage() {
                   </Link>
                   <Link
                     href="/checkout/payment"
-                    className={`inline-flex justify-center rounded-md px-8 py-3 font-body text-sm text-white ${
-                      selectedAddress
-                        ? "bg-primary-container hover:bg-secondary"
-                        : "cursor-not-allowed bg-outline-variant"
-                    }`}
+                    className={`inline-flex justify-center rounded-md px-8 py-3 font-body text-sm text-white ${selectedAddress
+                      ? "bg-primary-container hover:bg-secondary"
+                      : "cursor-not-allowed bg-outline-variant"
+                      }`}
                   >
                     Continue to shipping
                   </Link>
