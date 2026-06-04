@@ -9,17 +9,31 @@ import api from '@/lib/api';
 export default function BestSellers() {
   const [bestSellers, setBestSellers] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [pagination, setPagination] = useState({ page: 1, totalPages: 1, hasNextPage: false, hasPrevPage: false });
+  const [pagination, setPagination] = useState({
+    page: 1,
+    totalPages: 1,
+    hasNextPage: false,
+    hasPrevPage: false,
+  });
   const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
     const fetchBestSellers = async () => {
       setLoading(true);
       try {
-        const { data } = await api.get(`/products?showInBestSellers=true&limit=8&sort=newest&page=${currentPage}`);
+        const { data } = await api.get(
+          `/products?showInBestSellers=true&limit=8&sort=newest&page=${currentPage}`
+        );
         if (data?.data) {
-          setBestSellers(data.data);
-          setPagination(data.pagination || { page: 1, totalPages: 1, hasNextPage: false, hasPrevPage: false });
+          setBestSellers(data.data); // ✅ Bug 1 fixed: removed client-side .filter()
+          setPagination(
+            data.pagination || {
+              page: 1,
+              totalPages: 1,
+              hasNextPage: false,
+              hasPrevPage: false,
+            }
+          );
         }
       } catch (error) {
         console.error('Failed to fetch best sellers:', error);
@@ -32,7 +46,6 @@ export default function BestSellers() {
 
   const goToPage = (page) => {
     setCurrentPage(page);
-    // Scroll to section top smoothly
     document.getElementById('best-sellers')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
@@ -52,6 +65,7 @@ export default function BestSellers() {
           </p>
         </div>
 
+        {/* Grid */}
         {loading ? (
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {[...Array(4)].map((_, idx) => (
@@ -59,7 +73,9 @@ export default function BestSellers() {
             ))}
           </div>
         ) : bestSellers.length === 0 ? (
-          <p className="text-center text-on-surface-variant py-12">No best sellers available right now.</p>
+          <p className="py-12 text-center text-on-surface-variant">
+            No best sellers available right now.
+          </p>
         ) : (
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {bestSellers.map((product, index) => (
@@ -73,8 +89,8 @@ export default function BestSellers() {
           </div>
         )}
 
-        {/* Pagination */}
-        {pagination.totalPages > 1 && (
+        {/* Pagination — only shows when backend says totalPages > 1 */}
+        {!loading && pagination.totalPages > 1 && (
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -83,10 +99,12 @@ export default function BestSellers() {
             {/* Prev */}
             <button
               onClick={() => goToPage(currentPage - 1)}
-              disabled={!pagination.hasPrevPage || loading}
+              disabled={!pagination.hasPrevPage}
               className="flex items-center gap-1.5 rounded-full border border-border px-5 py-2 font-body text-sm text-charcoal transition-all duration-200 hover:border-primary-container hover:text-primary-container disabled:cursor-not-allowed disabled:opacity-40"
             >
-              <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>arrow_back</span>
+              <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>
+                arrow_back
+              </span>
               Prev
             </button>
 
@@ -96,12 +114,10 @@ export default function BestSellers() {
                 <button
                   key={page}
                   onClick={() => goToPage(page)}
-                  disabled={loading}
-                  className={`h-9 w-9 rounded-full font-body text-sm transition-all duration-200 disabled:cursor-not-allowed ${
-                    page === currentPage
+                  className={`h-9 w-9 rounded-full font-body text-sm transition-all duration-200 ${page === currentPage
                       ? 'bg-primary-container text-white'
                       : 'border border-border text-charcoal hover:border-primary-container hover:text-primary-container'
-                  }`}
+                    }`}
                 >
                   {page}
                 </button>
@@ -111,11 +127,13 @@ export default function BestSellers() {
             {/* Next */}
             <button
               onClick={() => goToPage(currentPage + 1)}
-              disabled={!pagination.hasNextPage || loading}
+              disabled={!pagination.hasNextPage}
               className="flex items-center gap-1.5 rounded-full border border-border px-5 py-2 font-body text-sm text-charcoal transition-all duration-200 hover:border-primary-container hover:text-primary-container disabled:cursor-not-allowed disabled:opacity-40"
             >
               Next
-              <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>arrow_forward</span>
+              <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>
+                arrow_forward
+              </span>
             </button>
           </motion.div>
         )}

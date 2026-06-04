@@ -19,13 +19,13 @@ export default function CheckoutPaymentPage() {
   const [error, setError] = useState('');
   const [showMockModal, setShowMockModal] = useState(false);
   const [mockOrderData, setMockOrderData] = useState(null);
-  
+
   const user = useAuthStore((state) => state.user);
   const addresses = useAuthStore((state) => state.addresses);
   const selectedAddressId = useAuthStore((state) => state.selectedAddressId);
   const cartItems = useCart((state) => state.items);
   const clearCart = useCart((state) => state.clearCart);
-  
+
   const selectedAddress = addresses.find((a) => a.id === selectedAddressId || a._id === selectedAddressId) || addresses[0];
 
   const subtotal = useMemo(
@@ -149,7 +149,7 @@ export default function CheckoutPaymentPage() {
     } catch (err) {
       setError(err.response?.data?.message || err.message || 'Payment initiation failed');
       console.log(err.response);
-      
+
       setIsProcessing(false);
     }
   };
@@ -200,7 +200,7 @@ export default function CheckoutPaymentPage() {
   return (
     <ProtectedRoute>
       <Navbar />
-      <div className="min-h-screen bg-surface pt-20 md:pt-24">
+      <div className="min-h-screen bg-surface pt-20 md:pt-20">
         <div className="container-main py-8">
           <nav className="mb-8 font-body text-[13px] text-[#727973]">
             <span>Cart</span>
@@ -216,20 +216,19 @@ export default function CheckoutPaymentPage() {
             <div>
               <div className="mb-8 overflow-hidden rounded-lg border border-[#e4e2dd] bg-white">
                 {[
-                  { label: 'Contact', value: user?.email || 'customer@example.com' },
+                  // { label: 'Contact', value: user?.email || 'customer@example.com' },
                   {
                     label: 'Ship to',
                     value: selectedAddress
                       ? `${selectedAddress.fullName || user?.name}, ${selectedAddress.line1}, ${selectedAddress.city}, ${selectedAddress.state} ${selectedAddress.pincode}`
                       : 'No address selected',
                   },
-                  { label: 'Method', value: `Standard Shipping · ${formatINR(shipping)}` },
+                  // { label: 'Method', value: `Standard Shipping · ${formatINR(shipping)}` },
                 ].map((row, i) => (
                   <div
                     key={row.label}
-                    className={`flex items-start justify-between px-5 py-4 ${
-                      i > 0 ? 'border-t border-surface-container' : ''
-                    }`}
+                    className={`flex items-start justify-between px-5 py-4 ${i > 0 ? 'border-t border-surface-container' : ''
+                      }`}
                   >
                     <div>
                       <p className="font-body text-xs text-[#727973]">{row.label}</p>
@@ -299,11 +298,10 @@ export default function CheckoutPaymentPage() {
                   type="button"
                   onClick={handlePayment}
                   disabled={isProcessing || !selectedAddress || cartItems.length === 0}
-                  className={`rounded-md px-8 py-3 font-body text-sm text-white transition-all ${
-                    isProcessing || !selectedAddress || cartItems.length === 0
-                      ? 'cursor-not-allowed bg-outline-variant opacity-60'
-                      : 'bg-primary-container hover:bg-secondary'
-                  }`}
+                  className={`rounded-md px-8 py-3 font-body text-sm text-white transition-all ${isProcessing || !selectedAddress || cartItems.length === 0
+                    ? 'cursor-not-allowed bg-outline-variant opacity-60'
+                    : 'bg-primary-container hover:bg-secondary'
+                    }`}
                 >
                   {isProcessing ? 'Processing...' : `Pay ₹${(total).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
                 </button>
@@ -332,7 +330,7 @@ export default function CheckoutPaymentPage() {
                 <h3 className="font-display text-lg font-semibold tracking-wide">Venus Essentials</h3>
                 <p className="font-body text-xs text-[#d1dcd5] mt-1">Simulated Razorpay Payment Gateway</p>
               </div>
-              
+
               {/* Body */}
               <div className="p-6">
                 <div className="text-center mb-6">

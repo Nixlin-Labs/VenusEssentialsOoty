@@ -1,10 +1,17 @@
-import Link from 'next/link';
-import { footerLinks } from '@/lib/data';
-import { useSettingsStore } from '@/lib/settingsStore';
+import Link from "next/link";
+import { footerLinks } from "@/lib/data";
+import { useSettingsStore } from "@/lib/settingsStore";
 
 function InstagramIcon() {
   return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+    <svg
+      width="18"
+      height="18"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+    >
       <rect x="2" y="2" width="20" height="20" rx="5" />
       <circle cx="12" cy="12" r="4" />
       <circle cx="18" cy="6" r="1" fill="currentColor" />
@@ -28,80 +35,62 @@ function YoutubeIcon() {
   );
 }
 
-export default function Footer({ variant = 'default' }) {
+export default function Footer({ variant = "default" }) {
   const { settings } = useSettingsStore();
-  console.log(settings);
-  
 
-company_address
-: 
-"Ooty, Tamil Nadu, India"
-company_email
-: 
-"elamaranvikki@gmail.com"
-company_name
-: 
-"Venus Essentials"
-company_phone
-: 
-"+919876543210"
-currency
-: 
-"INR"
-default_gst_percentage
-: 
-18
-default_shipping_charge
-: 
-50
-facebook_url
-: 
-""
-free_shipping_threshold
-: 
-500
-gst_number
-: 
-"GSTNUM"
-instagram_url
-: 
-""
-invoice_prefix
-: 
-"INV"
-site_description
-: 
-"Premium coffee, tea, essential oils and chocolates from the hills of Ooty. 40+ years of heritage wellness."
-site_title
-: 
-"Venus Essentials - Premium Wellness from Ooty"
-whatsapp_number
-: 
-"+919876543210"
-youtube_url
-: 
-""
-  if (variant === 'minimal') {
+  company_address: "Ooty, Tamil Nadu, India";
+  company_email: "elamaranvikki@gmail.com";
+  company_name: "Venus Essentials";
+  company_phone: "+919876543210";
+  currency: "INR";
+  default_gst_percentage: 18;
+  default_shipping_charge: 50;
+  facebook_url: "";
+  free_shipping_threshold: 500;
+  gst_number: "GSTNUM";
+  instagram_url: "";
+  invoice_prefix: "INV";
+  site_description: "Premium coffee, tea, essential oils and chocolates from the hills of Ooty. 40+ years of heritage wellness.";
+  site_title: "Venus Essentials - Premium Wellness from Ooty";
+  whatsapp_number: "+919876543210";
+  youtube_url: "";
+
+
+  
+  if (variant === "minimal") {
     return (
-      <footer className="border-t border-outline-variant bg-surface-container py-10">
+      <footer className="py-10 border-t border-outline-variant bg-surface-container">
         <div className="container-main">
           <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
             <div>
-              <p className="font-display text-lg text-charcoal">Venus Ooty Essentials</p>
-              <p className="mt-1 font-body text-sm text-on-surface-variant">
+              <p className="text-lg font-display text-charcoal">
+                Venus Ooty Essentials
+              </p>
+              <p className="mt-1 text-sm font-body text-on-surface-variant">
                 Artisanal wellness from the Nilgiris.
               </p>
             </div>
             <div className="flex flex-wrap gap-5 font-body text-[13px] text-on-surface-variant">
-              <Link href="#" className="hover:text-charcoal">Privacy Policy</Link>
-              <Link href="#" className="hover:text-charcoal">Shipping & Returns</Link>
-              <Link href="/contact" className="hover:text-charcoal">Wholesale</Link>
-              <Link href="/contact" className="font-medium text-charcoal">Contact Us</Link>
-              <Link href="#" className="hover:text-charcoal">Sustainability</Link>
+              <Link href="#" className="hover:text-charcoal">
+                Privacy Policy
+              </Link>
+              <Link href="#" className="hover:text-charcoal">
+                Shipping & Returns
+              </Link>
+              <Link href="/contact" className="hover:text-charcoal">
+                Wholesale
+              </Link>
+              <Link href="/contact" className="font-medium text-charcoal">
+                Contact Us
+              </Link>
+              <Link href="#" className="hover:text-charcoal">
+                Sustainability
+              </Link>
             </div>
           </div>
           <p className="mt-6 text-center font-body text-[13px] text-outline">
-            © {new Date().getFullYear()} Venus Ooty Essentials. Artisanal Wellness from the Nilgiris.
+            © {new Date().getFullYear()} Venus Ooty Essentials. Artisanal
+            Wellness from the Nilgiris.
           </p>
         </div>
       </footer>
@@ -111,40 +100,60 @@ youtube_url
   return (
     <footer className="border-t border-outline-variant bg-surface">
       {/* Upper footer */}
-      <div className="container-main py-16">
+      <div className="py-16 container-main">
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
           {/* Brand column */}
           <div className="sm:col-span-2 lg:col-span-1">
-            <p className="font-display text-xl text-charcoal">Venus Ooty Essentials</p>
-            <p className="mt-3 max-w-[220px] font-body text-sm leading-relaxed text-on-surface-variant">
-              Handcrafted botanical wellness from the misty Nilgiri highlands. Pure essentials,
-              bottled with care.
+            <p className="text-xl font-display text-charcoal">
+              Venus Ooty Essentials
             </p>
-            <div className="mt-5 flex gap-3 text-on-surface-variant">
+            <p className="mt-3 max-w-[220px] font-body text-sm leading-relaxed text-on-surface-variant">
+              Handcrafted botanical wellness from the misty Nilgiri highlands.
+              Pure essentials, bottled with care.
+            </p>
+            <div className="flex gap-3 mt-5 text-on-surface-variant">
               {settings?.instagram_url && (
-                <a href={settings.instagram_url} target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="hover:text-charcoal transition-colors">
+                <a
+                  href={settings.instagram_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Instagram"
+                  className="transition-colors hover:text-charcoal"
+                >
                   <InstagramIcon />
                 </a>
               )}
               {settings?.facebook_url && (
-                <a href={settings.facebook_url} target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="hover:text-charcoal transition-colors">
+                <a
+                  href={settings.facebook_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Facebook"
+                  className="transition-colors hover:text-charcoal"
+                >
                   <PinterestIcon />
                 </a>
               )}
               {settings?.youtube_url && (
-                <a href={settings.youtube_url} target="_blank" rel="noopener noreferrer" aria-label="YouTube" className="hover:text-charcoal transition-colors">
+                <a
+                  href={settings.youtube_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="YouTube"
+                  className="transition-colors hover:text-charcoal"
+                >
                   <YoutubeIcon />
                 </a>
               )}
               {/* {(!settings?.instagram_url && !settings?.facebook_url && !settings?.youtube_url) && (
                 <>
-                  <a href="#" aria-label="Instagram" className="hover:text-charcoal transition-colors">
+                  <a href="#" aria-label="Instagram" className="transition-colors hover:text-charcoal">
                     <InstagramIcon />
                   </a>
-                  <a href="#" aria-label="Pinterest" className="hover:text-charcoal transition-colors">
+                  <a href="#" aria-label="Pinterest" className="transition-colors hover:text-charcoal">
                     <PinterestIcon />
                   </a>
-                  <a href="#" aria-label="YouTube" className="hover:text-charcoal transition-colors">
+                  <a href="#" aria-label="YouTube" className="transition-colors hover:text-charcoal">
                     <YoutubeIcon />
                   </a>
                 </>
@@ -162,7 +171,7 @@ youtube_url
                 <li key={link.label}>
                   <Link
                     href={link.href}
-                    className="font-body text-sm text-on-surface-variant transition-colors hover:text-charcoal"
+                    className="text-sm transition-colors font-body text-on-surface-variant hover:text-charcoal"
                   >
                     {link.label}
                   </Link>
@@ -181,7 +190,7 @@ youtube_url
                 <li key={link.label}>
                   <Link
                     href={link.href}
-                    className="font-body text-sm text-on-surface-variant transition-colors hover:text-charcoal"
+                    className="text-sm transition-colors font-body text-on-surface-variant hover:text-charcoal"
                   >
                     {link.label}
                   </Link>
@@ -196,34 +205,48 @@ youtube_url
               Get in Touch
             </p>
             <ul className="space-y-3">
-              <li className="flex items-start gap-2 font-body text-sm text-on-surface-variant">
-                <span className="material-symbols-outlined mt-0.5 text-secondary" style={{ fontSize: '16px' }}>
+              <li className="flex items-start gap-2 text-sm font-body text-on-surface-variant">
+                <span
+                  className="material-symbols-outlined mt-0.5 text-secondary"
+                  style={{ fontSize: "16px" }}
+                >
                   location_on
                 </span>
-                <span className="whitespace-pre-wrap">{settings?.company_address || '14 Botanical Garden Road,\nOoty, Tamil Nadu 643001'}</span>
+                <span className="whitespace-pre-wrap">
+                  {settings?.company_address ||
+                    "14 Botanical Garden Road,\nOoty, Tamil Nadu 643001"}
+                </span>
               </li>
               <li>
                 <a
-                  href={`mailto:${settings?.company_email || 'hello@venusooty.com'}`}
-                  className="flex items-center gap-2 font-body text-sm text-on-surface-variant transition-colors hover:text-charcoal"
+                  href={`mailto:${settings?.company_email || "hello@venusooty.com"}`}
+                  className="flex items-center gap-2 text-sm transition-colors font-body text-on-surface-variant hover:text-charcoal"
                 >
-                  <span className="material-symbols-outlined text-secondary" style={{ fontSize: '16px' }}>
+                  <span
+                    className="material-symbols-outlined text-secondary"
+                    style={{ fontSize: "16px" }}
+                  >
                     mail
                   </span>
-                  {settings?.company_email || 'hello@venusooty.com'}
+                  {settings?.company_email || "hello@venusooty.com"}
                 </a>
               </li>
               <li>
                 <a
-                  href={`https://wa.me/${(settings?.whatsapp_number || settings?.company_phone || '919876543210').replace(/[^0-9]/g, '')}`}
+                  href={`https://wa.me/${(settings?.whatsapp_number || settings?.company_phone || "919876543210").replace(/[^0-9]/g, "")}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-2 font-body text-sm text-on-surface-variant transition-colors hover:text-charcoal"
+                  className="flex items-center gap-2 text-sm transition-colors font-body text-on-surface-variant hover:text-charcoal"
                 >
-                  <span className="material-symbols-outlined text-secondary" style={{ fontSize: '16px' }}>
+                  <span
+                    className="material-symbols-outlined text-secondary"
+                    style={{ fontSize: "16px" }}
+                  >
                     chat
                   </span>
-                  WhatsApp Us
+                  <span className="whitespace-pre-wrap">
+                    {settings?.whatsapp_number || settings?.company_phone || "+91 98765 43210"}
+                  </span>
                 </a>
               </li>
             </ul>
@@ -233,9 +256,10 @@ youtube_url
 
       {/* Lower footer bar */}
       <div className="border-t border-outline-variant bg-surface-container-low">
-        <div className="container-main flex flex-col items-center justify-between gap-3 py-5 text-center sm:flex-row">
+        <div className="flex flex-col items-center justify-between gap-3 py-5 text-center container-main sm:flex-row">
           <p className="font-body text-[13px] text-outline">
-            © {new Date().getFullYear()} Venus Ooty Essentials. All rights reserved.
+            © {new Date().getFullYear()} Venus Ooty Essentials. All rights
+            reserved.
           </p>
           <p className="font-body text-[13px] text-outline">
             Design & Developed by Nixlin Labs

@@ -90,11 +90,10 @@ function FilterContent({
           <li>
             <button
               onClick={() => handleCategoryChange('')}
-              className={`w-full text-left rounded-full transition-all duration-200 px-4 py-2.5 ${
-                !activeCategory
+              className={`w-full text-left rounded-full transition-all duration-200 px-4 py-2.5 ${!activeCategory
                   ? 'bg-primary text-white font-medium shadow-sm'
                   : 'text-on-surface-variant hover:text-charcoal hover:bg-surface-container/50'
-              }`}
+                }`}
             >
               All Products
             </button>
@@ -105,11 +104,10 @@ function FilterContent({
               <li key={cat._id || cat.slug}>
                 <button
                   onClick={() => handleCategoryChange(cat.slug)}
-                  className={`w-full text-left rounded-full transition-all duration-200 px-4 py-2.5 ${
-                    isActive
+                  className={`w-full text-left rounded-full transition-all duration-200 px-4 py-2.5 ${isActive
                       ? 'bg-primary text-white font-medium shadow-sm'
                       : 'text-on-surface-variant hover:text-charcoal hover:bg-surface-container/50'
-                  }`}
+                    }`}
                 >
                   {cat.name}
                 </button>
@@ -156,14 +154,12 @@ function FilterContent({
           <button
             type="button"
             onClick={() => handleStockChange(!inStockOnly)}
-            className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out outline-none ${
-              inStockOnly ? 'bg-secondary' : 'bg-outline-variant/50'
-            }`}
+            className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out outline-none ${inStockOnly ? 'bg-secondary' : 'bg-outline-variant/50'
+              }`}
           >
             <span
-              className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
-                inStockOnly ? 'translate-x-5' : 'translate-x-0'
-              }`}
+              className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${inStockOnly ? 'translate-x-5' : 'translate-x-0'
+                }`}
             />
           </button>
         </div>
@@ -304,7 +300,7 @@ function ShopPageContent() {
       <Navbar activeLink="Shop All" />
       <main className="bg-background text-on-background font-body antialiased overflow-x-hidden min-h-screen">
         {/* Page Header */}
-        <header className="pt-32 pb-16 md:pt-40 md:pb-24 px-5 md:px-16 text-center">
+        <header className="pt-20 pb-10 md:pt-28 md:pb-16 px-5 md:px-16 text-center">
           <div className="max-w-3xl mx-auto">
             <h1 className="font-display text-4xl md:text-5xl lg:text-6xl text-primary mb-6">
               Artisanal Collections
@@ -403,7 +399,7 @@ function ShopPageContent() {
                 >
                   <span className="material-symbols-outlined text-[18px]">chevron_left</span>
                 </button>
-                
+
                 {[...Array(pagination.totalPages)].map((_, i) => {
                   const pageNum = i + 1;
                   const isActive = currentPage === pageNum;
@@ -411,11 +407,10 @@ function ShopPageContent() {
                     <button
                       key={pageNum}
                       onClick={() => updateFilters('page', pageNum.toString())}
-                      className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors ${
-                        isActive
+                      className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors ${isActive
                           ? 'bg-primary text-white font-semibold'
                           : 'font-body text-sm text-on-surface-variant hover:text-primary hover:border hover:border-outline-variant'
-                      }`}
+                        }`}
                     >
                       {pageNum}
                     </button>
@@ -513,7 +508,7 @@ function ShopPageSkeleton() {
           <div className="flex-grow">
             {/* Toolbar */}
             <div className="h-10 w-full border-b border-outline-variant/30 mb-8 animate-pulse" />
-            
+
             {/* Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-x-6 gap-y-12">
               {[...Array(6)].map((_, idx) => (

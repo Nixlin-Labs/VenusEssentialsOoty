@@ -13,7 +13,6 @@ export default function CuratedCollections() {
       const { data } = await api.get('/categories');
       const categories = data.data || [];
 
-      // Map homeViewOption to position slots (only 1, 2, 3 — skip 0)
       const mapped = { '1': null, '2': null, '3': null };
       categories.forEach((cat) => {
         if (['1', '2', '3'].includes(cat.homeViewOption)) {
@@ -37,23 +36,23 @@ export default function CuratedCollections() {
   if (loading) {
     return (
       <section className="section-spacing">
-        <div className="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop">
+        <div className="mx-auto max-w-container-max px-margin-mobile md:px-margin-desktop">
           <div className="text-center mb-section-gap-mobile animate-pulse">
             <h2 className="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-primary mb-stack-sm">
               Curated Collections
             </h2>
-            <div className="h-4 w-64 bg-neutral-200 mx-auto rounded mt-2" />
+            <div className="w-64 h-4 mx-auto mt-2 rounded bg-neutral-200" />
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-gutter auto-rows-[250px] md:auto-rows-[300px]">
-            <div className="md:col-span-2 md:row-span-2 rounded-lg bg-neutral-200/60 animate-pulse relative p-8 flex flex-col justify-end">
-              <div className="h-6 w-1/3 bg-neutral-300 rounded mb-2" />
-              <div className="h-4 w-1/4 bg-neutral-300 rounded" />
+            <div className="relative flex flex-col justify-end p-8 rounded-lg md:col-span-2 md:row-span-2 bg-neutral-200/60 animate-pulse">
+              <div className="w-1/3 h-6 mb-2 rounded bg-neutral-300" />
+              <div className="w-1/4 h-4 rounded bg-neutral-300" />
             </div>
-            <div className="rounded-lg bg-neutral-200/60 animate-pulse relative p-6 flex flex-col justify-end">
-              <div className="h-5 w-1/2 bg-neutral-300 rounded" />
+            <div className="relative flex flex-col justify-end p-6 rounded-lg bg-neutral-200/60 animate-pulse">
+              <div className="w-1/2 h-5 rounded bg-neutral-300" />
             </div>
-            <div className="rounded-lg bg-neutral-200/60 animate-pulse relative p-6 flex flex-col justify-end">
-              <div className="h-5 w-1/2 bg-neutral-300 rounded" />
+            <div className="relative flex flex-col justify-end p-6 rounded-lg bg-neutral-200/60 animate-pulse">
+              <div className="w-1/2 h-5 rounded bg-neutral-300" />
             </div>
           </div>
         </div>
@@ -61,7 +60,6 @@ export default function CuratedCollections() {
     );
   }
 
-  // Don't render the section at all if no home-view categories are configured
   const hasAnyCard = cards['1'] || cards['2'] || cards['3'];
   if (!hasAnyCard) return null;
 
@@ -76,7 +74,7 @@ export default function CuratedCollections() {
         {getImageUrl(cat.image?.url) ? (
           <img
             alt={cat.image?.alt || cat.name}
-            className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+            className="absolute inset-0 object-cover w-full h-full transition-transform duration-700 group-hover:scale-105"
             src={getImageUrl(cat.image.url)}
           />
         ) : (
@@ -90,9 +88,9 @@ export default function CuratedCollections() {
             {cat.name}
           </h3>
           {large && (
-            <p className="font-body-sm text-body-sm text-on-primary/90 flex items-center group-hover:translate-x-2 transition-transform duration-300">
+            <p className="flex items-center transition-transform duration-300 font-body-sm text-body-sm text-on-primary/90 group-hover:translate-x-2">
               Shop Category
-              <span className="material-symbols-outlined ml-2 text-sm">arrow_forward</span>
+              <span className="ml-2 text-sm material-symbols-outlined">arrow_forward</span>
             </p>
           )}
         </div>
@@ -102,7 +100,7 @@ export default function CuratedCollections() {
 
   return (
     <section className="section-spacing">
-      <div className="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop">
+      <div className="mx-auto max-w-container-max px-margin-mobile md:px-margin-desktop">
         <div className="text-center mb-section-gap-mobile">
           <h2 className="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-primary mb-stack-sm">
             Curated Collections
