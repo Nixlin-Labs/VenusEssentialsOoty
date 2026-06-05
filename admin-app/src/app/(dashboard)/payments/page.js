@@ -3,7 +3,8 @@
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import adminApi from '@/lib/api';
-import { FiSearch, FiEye, FiX, FiCheckCircle, FiAlertCircle, FiClock, FiCornerDownRight } from 'react-icons/fi';
+import { FiSearch, FiEye, FiX, FiAlertCircle, FiCornerDownRight } from 'react-icons/fi';
+import ActionMenu from '@/components/ActionMenu';
 
 const statusColors = {
   created: 'bg-info-bg text-info',
@@ -128,7 +129,7 @@ export default function AdminPaymentsPage() {
                   <th>Method</th>
                   <th>Status</th>
                   <th>Date & Time</th>
-                  <th>Actions</th>
+                  <th className="text-right">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -182,13 +183,12 @@ export default function AdminPaymentsPage() {
                     </td>
                     <td className="text-xs text-muted font-medium">{formatDateTime(payment.createdAt)}</td>
                     <td>
-                      <button
-                        onClick={() => setSelectedPayment(payment)}
-                        className="admin-btn admin-btn-secondary py-1 px-2.5 flex items-center gap-1.5 text-xs text-info hover:text-white"
-                        title="View Details"
-                      >
-                        <FiEye /> View
-                      </button>
+                      <ActionMenu
+                        label={`Open actions for payment ${payment.razorpayOrderId}`}
+                        actions={[
+                          { label: 'View details', icon: FiEye, onClick: () => setSelectedPayment(payment) },
+                        ]}
+                      />
                     </td>
                   </tr>
                 ))}

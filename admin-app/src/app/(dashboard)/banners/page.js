@@ -1,9 +1,12 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { toast } from 'sonner';
+import { FiEdit2, FiTrash2 } from 'react-icons/fi';
 import adminApi from '@/lib/api';
 import useConfirmStore from '@/store/useConfirmStore';
+import ActionMenu from '@/components/ActionMenu';
 
 export default function AdminBannersPage() {
   const [banners, setBanners] = useState([]);
@@ -81,16 +84,21 @@ export default function AdminBannersPage() {
           banners.map((b) => (
             <div key={b._id} className="admin-card p-0 overflow-hidden">
               <div className="aspect-[16/9] bg-charcoal-50 relative">
-                {b.image ? <img src={`http://localhost:5000${b.image}`} alt={b.title} className="w-full h-full object-cover" /> :
+                {b.image ? <Image src={`http://localhost:5000${b.image}`} alt={b.title} fill sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw" className="object-cover" /> :
                   <div className="w-full h-full flex items-center justify-center text-3xl">🖼️</div>}
                 <span className={`admin-badge absolute top-2 right-2 ${b.isActive ? 'bg-success-bg text-success' : 'bg-charcoal-50 text-charcoal-500'}`}>{b.isActive ? 'Active' : 'Inactive'}</span>
               </div>
               <div className="p-4">
                 <h4 className="font-semibold text-charcoal-900 text-sm">{b.title}</h4>
                 <p className="text-xs text-muted mt-0.5">{b.position} · Order: {b.sortOrder}</p>
-                <div className="flex gap-2 mt-3">
-                  <button onClick={() => handleEdit(b)} className="text-xs text-info hover:underline">Edit</button>
-                  <button onClick={() => handleDelete(b._id)} className="text-xs text-error hover:underline">Delete</button>
+                <div className="flex justify-end mt-3">
+                  <ActionMenu
+                    label={`Open actions for ${b.title}`}
+                    actions={[
+                      { label: 'Edit', icon: FiEdit2, onClick: () => handleEdit(b) },
+                      { label: 'Delete', icon: FiTrash2, danger: true, onClick: () => handleDelete(b._id) },
+                    ]}
+                  />
                 </div>
               </div>
             </div>

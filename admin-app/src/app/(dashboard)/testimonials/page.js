@@ -5,7 +5,8 @@ import { toast } from 'sonner';
 import adminApi from '@/lib/api';
 import useConfirmStore from '@/store/useConfirmStore';
 import CustomDropdown from '@/components/CustomDropdown';
-import { FiSearch, FiMoreVertical } from 'react-icons/fi';
+import { FiEdit2, FiEye, FiEyeOff, FiSearch, FiTrash2 } from 'react-icons/fi';
+import ActionMenu from '@/components/ActionMenu';
 
 const EMPTY_FORM = { name: '', location: '', text: '', rating: 5, isActive: true, sortOrder: 0 };
 
@@ -57,7 +58,6 @@ export default function AdminTestimonialsPage() {
   const [statusFilter, setStatusFilter] = useState('');
   const [ratingFilter, setRatingFilter] = useState('');
   const [page, setPage] = useState(1);
-  const [openMenuId, setOpenMenuId] = useState(null);
 
   const fetchTestimonials = async () => {
     setLoading(true);
@@ -73,13 +73,6 @@ export default function AdminTestimonialsPage() {
 
   useEffect(() => {
     fetchTestimonials();
-  }, []);
-
-  // Close any open action menu when clicking outside
-  useEffect(() => {
-    const handleCloseMenu = () => setOpenMenuId(null);
-    window.addEventListener('click', handleCloseMenu);
-    return () => window.removeEventListener('click', handleCloseMenu);
   }, []);
 
   // Filtered testimonials (client-side)
@@ -422,7 +415,7 @@ export default function AdminTestimonialsPage() {
                     <th style={{ width: '10%' }} className="text-center">Rating</th>
                     <th style={{ width: '8%' }} className="text-center">Order</th>
                     <th style={{ width: '10%' }}>Status</th>
-                    <th style={{ width: '2%' }}></th>
+                    <th style={{ width: '2%' }} className="text-right">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -454,54 +447,19 @@ export default function AdminTestimonialsPage() {
                         </span>
                       </td>
                       <td>
-                        <div className="relative">
-                          <button
-                            type="button"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setOpenMenuId(openMenuId === t._id ? null : t._id);
-                            }}
-                            className="p-1 hover:bg-charcoal-100 rounded-md transition-colors text-charcoal-500 hover:text-charcoal-900 cursor-pointer"
-                            title="Actions"
-                          >
-                            <FiMoreVertical size={16} />
-                          </button>
-                          
-                          {openMenuId === t._id && (
-                            <div className="absolute right-0 mt-1 w-32 bg-surface border border-border shadow-lg rounded-md py-1 z-30">
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  openEdit(t);
-                                  setOpenMenuId(null);
-                                }}
-                                className="w-full text-left px-3 py-1.5 text-xs font-medium hover:bg-charcoal-50 text-charcoal-700 transition-colors"
-                              >
-                                Edit
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  handleToggle(t._id);
-                                  setOpenMenuId(null);
-                                }}
-                                className="w-full text-left px-3 py-1.5 text-xs font-medium hover:bg-charcoal-50 text-charcoal-700 transition-colors"
-                              >
-                                {t.isActive ? 'Hide' : 'Show'}
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  handleDelete(t._id);
-                                  setOpenMenuId(null);
-                                }}
-                                className="w-full text-left px-3 py-1.5 text-xs font-medium hover:bg-charcoal-50 text-error transition-colors"
-                              >
-                                Delete
-                              </button>
-                            </div>
-                          )}
-                        </div>
+                        <ActionMenu
+                          label={`Open actions for ${t.name}`}
+                          actions={[
+                            { label: 'Edit', icon: FiEdit2, onClick: () => openEdit(t) },
+                            {
+                              label: t.isActive ? 'Hide' : 'Show',
+                              icon: t.isActive ? FiEyeOff : FiEye,
+                              success: !t.isActive,
+                              onClick: () => handleToggle(t._id),
+                            },
+                            { label: 'Delete', icon: FiTrash2, danger: true, onClick: () => handleDelete(t._id) },
+                          ]}
+                        />
                       </td>
                     </tr>
                   ))}

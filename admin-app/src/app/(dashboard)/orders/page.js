@@ -2,7 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
+import { FiSettings } from 'react-icons/fi';
 import adminApi from '@/lib/api';
+import ActionMenu from '@/components/ActionMenu';
 
 const statusColors = {
   placed: 'bg-info-bg text-info',
@@ -92,7 +94,7 @@ export default function AdminOrdersPage() {
                 <th>Payment</th>
                 <th>Status</th>
                 <th>Date</th>
-                <th>Actions</th>
+                <th className="text-right">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -119,12 +121,12 @@ export default function AdminOrdersPage() {
                   </td>
                   <td className="text-xs text-muted">{new Date(order.createdAt).toLocaleDateString('en-IN')}</td>
                   <td>
-                    <button
-                      onClick={() => { setSelectedOrder(order); setNewStatus(''); }}
-                      className="text-sm text-info hover:underline"
-                    >
-                      Manage
-                    </button>
+                    <ActionMenu
+                      label={`Open actions for order ${order.orderNumber}`}
+                      actions={[
+                        { label: 'Manage order', icon: FiSettings, onClick: () => { setSelectedOrder(order); setNewStatus(''); } },
+                      ]}
+                    />
                   </td>
                 </tr>
               ))}

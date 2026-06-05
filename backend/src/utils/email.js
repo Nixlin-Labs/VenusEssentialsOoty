@@ -2,6 +2,13 @@ const nodemailer = require('nodemailer');
 const env = require('../config/env');
 const Notification = require('../models/Notification');
 
+const escapeHtml = (value = '') => String(value)
+  .replace(/&/g, '&amp;')
+  .replace(/</g, '&lt;')
+  .replace(/>/g, '&gt;')
+  .replace(/"/g, '&quot;')
+  .replace(/'/g, '&#39;');
+
 // Create transporter
 const createTransporter = () => {
   return nodemailer.createTransport({
@@ -72,6 +79,8 @@ const sendEmail = async ({ to, subject, html, purpose = 'general' }) => {
  * Send OTP email.
  */
 const sendOTPEmail = async (to, otp, name) => {
+  const safeName = escapeHtml(name || 'there');
+  const safeOtp = escapeHtml(otp);
   const html = `
     <div style="font-family: 'Inter', Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #F9F7F2; padding: 40px;">
       <div style="text-align: center; margin-bottom: 32px;">
@@ -79,10 +88,10 @@ const sendOTPEmail = async (to, otp, name) => {
       </div>
       <div style="background: white; border-radius: 8px; padding: 32px; box-shadow: 0 2px 8px rgba(45, 71, 57, 0.06);">
         <h2 style="font-family: 'Playfair Display', serif; color: #1A1A1A; font-size: 22px;">Verify Your Account</h2>
-        <p style="color: #424844; line-height: 1.6;">Hello ${name || 'there'},</p>
+        <p style="color: #424844; line-height: 1.6;">Hello ${safeName},</p>
         <p style="color: #424844; line-height: 1.6;">Your verification code is:</p>
         <div style="text-align: center; margin: 24px 0;">
-          <span style="font-size: 32px; font-weight: 700; letter-spacing: 8px; color: #2D4739; background: #F2EFE9; padding: 16px 32px; border-radius: 8px; display: inline-block;">${otp}</span>
+          <span style="font-size: 32px; font-weight: 700; letter-spacing: 8px; color: #2D4739; background: #F2EFE9; padding: 16px 32px; border-radius: 8px; display: inline-block;">${safeOtp}</span>
         </div>
         <p style="color: #727973; font-size: 14px; line-height: 1.6;">This code expires in 10 minutes. Do not share it with anyone.</p>
       </div>
@@ -177,6 +186,8 @@ const sendDispatchEmail = async (to, order) => {
  * Send password reset email.
  */
 const sendPasswordResetEmail = async (to, otp, name) => {
+  const safeName = escapeHtml(name || 'there');
+  const safeOtp = escapeHtml(otp);
   const html = `
     <div style="font-family: 'Inter', Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #F9F7F2; padding: 40px;">
       <div style="text-align: center; margin-bottom: 32px;">
@@ -184,10 +195,10 @@ const sendPasswordResetEmail = async (to, otp, name) => {
       </div>
       <div style="background: white; border-radius: 8px; padding: 32px; box-shadow: 0 2px 8px rgba(45, 71, 57, 0.06);">
         <h2 style="font-family: 'Playfair Display', serif; color: #1A1A1A; font-size: 22px;">Reset Your Password</h2>
-        <p style="color: #424844; line-height: 1.6;">Hello ${name || 'there'},</p>
+        <p style="color: #424844; line-height: 1.6;">Hello ${safeName},</p>
         <p style="color: #424844; line-height: 1.6;">Your password reset code is:</p>
         <div style="text-align: center; margin: 24px 0;">
-          <span style="font-size: 32px; font-weight: 700; letter-spacing: 8px; color: #2D4739; background: #F2EFE9; padding: 16px 32px; border-radius: 8px; display: inline-block;">${otp}</span>
+          <span style="font-size: 32px; font-weight: 700; letter-spacing: 8px; color: #2D4739; background: #F2EFE9; padding: 16px 32px; border-radius: 8px; display: inline-block;">${safeOtp}</span>
         </div>
         <p style="color: #727973; font-size: 14px;">This code expires in 10 minutes. If you didn't request this, please ignore this email.</p>
       </div>

@@ -5,6 +5,7 @@
 // We re-export the same component but pass a fixed "new" context.
 
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
@@ -276,8 +277,9 @@ export default function NewProductPage() {
               <div className="grid grid-cols-4 sm:grid-cols-6 gap-3">
                 {newImagePreviews.map((url, idx) => (
                   <div key={idx} className="relative group aspect-square">
-                    <img src={url} alt="" onClick={() => openViewer(url)}
-                      className="w-full h-full object-cover rounded-lg border border-border cursor-pointer" />
+                    <button type="button" className="relative h-full w-full overflow-hidden rounded-lg border border-border" onClick={() => openViewer(url)}>
+                      <Image src={url} alt="" fill sizes="120px" unoptimized className="object-cover" />
+                    </button>
                     {idx === 0 && <span className="absolute top-1 left-1 bg-forest-800 text-white text-xs px-1 rounded">Primary</span>}
                     <button type="button" onClick={() => removeImage(idx)}
                       className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-5 h-5 text-xs hidden group-hover:flex items-center justify-center">×</button>

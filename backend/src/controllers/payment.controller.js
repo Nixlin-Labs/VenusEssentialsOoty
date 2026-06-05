@@ -5,11 +5,18 @@ const env = require('../config/env');
 const response = require('../utils/response');
 const { sendOrderConfirmationEmail } = require('../utils/email');
 
-// Initialize Razorpay
-const razorpay = new Razorpay({
-  key_id: env.RAZORPAY_KEY_ID,
-  key_secret: env.RAZORPAY_KEY_SECRET,
-});
+// Lazy initialize Razorpay only when credentials are available
+let razorpay = null;
+
+const getRazorpayInstance = () => {
+  if (!razorpay && env.RAZORPAY_KEY_ID && env.RAZORPAY_KEY_ID !== 'your_razorpay_key_id') {
+    razorpay = new Razorpay({
+      key_id: env.RAZORPAY_KEY_ID,
+      key_secret: env.RAZORPAY_KEY_SECRET,
+    });
+  }
+  return razorpay;
+};
 
 /**
  * POST /api/payments/create-order — Create Razorpay order and Venus order.
@@ -121,7 +128,11 @@ exports.createOrder = async (req, res, next) => {
       razorpayOrderId = `rzp_order_mock_${Math.random().toString(36).substring(2, 15)}`;
     } else {
       // Create Razorpay order
-      const razorpayOrder = await razorpay.orders.create({
+      const razorpayInstance = getRazorpayInstance();
+      if (!razorpayInstance) {
+        return response.serverError(res, 'Razorpay credentials not configured');
+      }
+      const razorpayOrder = await razorpayInstance.orders.create({
         amount: Math.round(total * 100), // Amount in paise
         currency: 'INR',
         receipt: order.orderNumber,

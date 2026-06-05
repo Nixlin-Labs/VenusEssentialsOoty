@@ -2,7 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
+import { FiEye, FiSlash, FiUnlock } from 'react-icons/fi';
 import adminApi from '@/lib/api';
+import ActionMenu from '@/components/ActionMenu';
 
 export default function AdminCustomersPage() {
   const [customers, setCustomers] = useState([]);
@@ -33,6 +35,11 @@ export default function AdminCustomersPage() {
     } catch (error) { toast.error('Action failed'); }
   };
 
+  const viewCustomer = async (id) => {
+    const { data } = await adminApi.get(`/admin/customers/${id}`);
+    setSelectedCustomer(data.data);
+  };
+
   return (
     <div className="space-y-6">
       <div><h2 className="text-xl font-bold text-charcoal-900">Customers</h2><p className="text-sm text-muted">Manage customer accounts</p></div>
@@ -47,7 +54,7 @@ export default function AdminCustomersPage() {
       <div className="admin-card p-0 overflow-hidden">
         {loading ? <div className="p-12 text-center"><span className="spinner mx-auto" /></div> : (
           <table className="admin-table">
-            <thead><tr><th>Customer</th><th>Email</th><th>Phone</th><th>Joined</th><th>Status</th><th>Actions</th></tr></thead>
+            <thead><tr><th>Customer</th><th>Email</th><th>Phone</th><th>Joined</th><th>Status</th><th className="text-right">Actions</th></tr></thead>
             <tbody>
               {customers.map((c) => (
                 <tr key={c._id}>
@@ -60,11 +67,20 @@ export default function AdminCustomersPage() {
                       {c.isBlocked ? 'Blocked' : c.isVerified ? 'Active' : 'Unverified'}
                     </span>
                   </td>
-                  <td className="space-x-2">
-                    <button onClick={async () => { const { data } = await adminApi.get(`/admin/customers/${c._id}`); setSelectedCustomer(data.data); }} className="text-sm text-info hover:underline">View</button>
-                    <button onClick={() => handleBlock(c._id)} className={`text-sm hover:underline ${c.isBlocked ? 'text-success' : 'text-error'}`}>
-                      {c.isBlocked ? 'Unblock' : 'Block'}
-                    </button>
+                  <td>
+                    <ActionMenu
+                      label={`Open actions for ${c.name}`}
+                      actions={[
+                        { label: 'View details', icon: FiEye, onClick: () => viewCustomer(c._id) },
+                        {
+                          label: c.isBlocked ? 'Unblock' : 'Block',
+                          icon: c.isBlocked ? FiUnlock : FiSlash,
+                          success: c.isBlocked,
+                          danger: !c.isBlocked,
+                          onClick: () => handleBlock(c._id),
+                        },
+                      ]}
+                    />
                   </td>
                 </tr>
               ))}

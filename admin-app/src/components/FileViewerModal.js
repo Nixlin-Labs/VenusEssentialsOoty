@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import useFileViewerStore from '@/store/useFileViewerStore';
 
 export default function FileViewerModal() {
@@ -23,10 +24,13 @@ export default function FileViewerModal() {
           &times;
         </button>
         {fileType === 'image' && (
-          <img 
-            src={fileUrl} 
-            alt="Preview" 
-            className="max-w-full max-h-[85vh] object-contain rounded shadow-2xl" 
+          <Image
+            src={fileUrl}
+            alt="Preview"
+            width={1600}
+            height={1200}
+            unoptimized
+            className="max-h-[85vh] max-w-full rounded object-contain shadow-2xl"
           />
         )}
         {fileType !== 'image' && (

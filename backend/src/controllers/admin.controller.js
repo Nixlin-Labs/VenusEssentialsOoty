@@ -59,13 +59,45 @@ exports.getDashboard = async (req, res, next) => {
 
 // ==================== PRODUCTS ====================
 
+const escapeRegex = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
 exports.getProducts = async (req, res, next) => {
   try {
     const { status, category, search, page, limit } = req.query;
     const filter = {};
     if (status) filter.status = status;
     if (category) filter.category = category;
-    if (search) filter.$or = [{ name: new RegExp(search, 'i') }, { tags: new RegExp(search, 'i') }];
+    if (search) {
+      const regex = new RegExp(escapeRegex(search.trim()), 'i');
+      const [matchingCategories, matchingVariants] = await Promise.all([
+        Category.find({ name: regex }).select('_id'),
+        ProductVariant.find({
+          $or: [
+            { name: regex },
+            { sku: regex },
+            { 'weight.unit': regex },
+          ],
+        }).select('product'),
+      ]);
+
+      filter.$or = [
+        { name: regex },
+        { slug: regex },
+        { description: regex },
+        { shortDescription: regex },
+        { ingredients: regex },
+        { status: regex },
+        { hsnCode: regex },
+        { tags: regex },
+        { seoTitle: regex },
+        { seoDescription: regex },
+        { seoKeywords: regex },
+        { 'specifications.key': regex },
+        { 'specifications.value': regex },
+        { category: { $in: matchingCategories.map((item) => item._id) } },
+        { _id: { $in: matchingVariants.map((item) => item.product).filter(Boolean) } },
+      ];
+    }
 
     const query = Product.find(filter).populate('category', 'name').populate('variants');
     const result = await paginate(query, { page, limit, sort: { createdAt: -1 } });
@@ -135,8 +167,13 @@ exports.updateProduct = async (req, res, next) => {
       data.images = data.existingImages;
     }
 
+    const wasArchived = product.status === 'archived';
     Object.assign(product, data);
     await product.save();
+
+    if (wasArchived && product.status !== 'archived') {
+      await ProductVariant.updateMany({ product: product._id }, { isActive: true });
+    }
 
     await createAuditLog({
       user: req.user, action: 'update', entity: 'product',

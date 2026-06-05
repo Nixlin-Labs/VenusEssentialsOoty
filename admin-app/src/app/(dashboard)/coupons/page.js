@@ -2,8 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
+import { FiEdit2, FiTrash2 } from 'react-icons/fi';
 import adminApi from '@/lib/api';
 import useConfirmStore from '@/store/useConfirmStore';
+import ActionMenu from '@/components/ActionMenu';
 
 export default function AdminCouponsPage() {
   const [coupons, setCoupons] = useState([]);
@@ -92,7 +94,7 @@ export default function AdminCouponsPage() {
       <div className="admin-card p-0 overflow-hidden">
         {loading ? <div className="p-12 text-center"><span className="spinner mx-auto" /></div> : coupons.length === 0 ? <div className="p-12 text-center text-muted">No coupons created yet</div> : (
           <table className="admin-table">
-            <thead><tr><th>Code</th><th>Discount</th><th>Min Order</th><th>Usage</th><th>Validity</th><th>Status</th><th>Actions</th></tr></thead>
+            <thead><tr><th>Code</th><th>Discount</th><th>Min Order</th><th>Usage</th><th>Validity</th><th>Status</th><th className="text-right">Actions</th></tr></thead>
             <tbody>
               {coupons.map((c) => (
                 <tr key={c._id}>
@@ -104,9 +106,14 @@ export default function AdminCouponsPage() {
                     {c.validFrom ? new Date(c.validFrom).toLocaleDateString('en-IN') : '—'} → {c.validUntil ? new Date(c.validUntil).toLocaleDateString('en-IN') : '—'}
                   </td>
                   <td><span className={`admin-badge ${c.isActive ? 'bg-success-bg text-success' : 'bg-charcoal-50 text-charcoal-500'}`}>{c.isActive ? 'Active' : 'Inactive'}</span></td>
-                  <td className="space-x-2">
-                    <button onClick={() => handleEdit(c)} className="text-sm text-info hover:underline">Edit</button>
-                    <button onClick={() => handleDelete(c._id)} className="text-sm text-error hover:underline">Delete</button>
+                  <td>
+                    <ActionMenu
+                      label={`Open actions for ${c.code}`}
+                      actions={[
+                        { label: 'Edit', icon: FiEdit2, onClick: () => handleEdit(c) },
+                        { label: 'Delete', icon: FiTrash2, danger: true, onClick: () => handleDelete(c._id) },
+                      ]}
+                    />
                   </td>
                 </tr>
               ))}

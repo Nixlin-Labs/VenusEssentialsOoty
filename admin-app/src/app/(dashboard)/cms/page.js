@@ -2,8 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
+import { FiEdit2, FiTrash2 } from 'react-icons/fi';
 import adminApi from '@/lib/api';
 import useConfirmStore from '@/store/useConfirmStore';
+import ActionMenu from '@/components/ActionMenu';
 
 export default function AdminCmsPage() {
   const [pages, setPages] = useState([]);
@@ -68,7 +70,7 @@ export default function AdminCmsPage() {
       <div className="admin-card p-0 overflow-hidden">
         {loading ? <div className="p-12 text-center"><span className="spinner mx-auto" /></div> : (
           <table className="admin-table">
-            <thead><tr><th>Title</th><th>Slug</th><th>Status</th><th>Updated</th><th>Actions</th></tr></thead>
+            <thead><tr><th>Title</th><th>Slug</th><th>Status</th><th>Updated</th><th className="text-right">Actions</th></tr></thead>
             <tbody>
               {pages.map((p) => (
                 <tr key={p._id}>
@@ -76,9 +78,14 @@ export default function AdminCmsPage() {
                   <td className="text-muted font-mono text-xs">/{p.slug}</td>
                   <td><span className={`admin-badge ${p.isActive ? 'bg-success-bg text-success' : 'bg-charcoal-50 text-charcoal-500'}`}>{p.isActive ? 'Published' : 'Draft'}</span></td>
                   <td className="text-xs text-muted">{new Date(p.updatedAt).toLocaleDateString('en-IN')}</td>
-                  <td className="space-x-2">
-                    <button onClick={() => handleEdit(p)} className="text-sm text-info hover:underline">Edit</button>
-                    <button onClick={() => handleDelete(p._id)} className="text-sm text-error hover:underline">Delete</button>
+                  <td>
+                    <ActionMenu
+                      label={`Open actions for ${p.title}`}
+                      actions={[
+                        { label: 'Edit', icon: FiEdit2, onClick: () => handleEdit(p) },
+                        { label: 'Delete', icon: FiTrash2, danger: true, onClick: () => handleDelete(p._id) },
+                      ]}
+                    />
                   </td>
                 </tr>
               ))}
