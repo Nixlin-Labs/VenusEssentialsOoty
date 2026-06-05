@@ -2,7 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
+import { FiEdit2 } from 'react-icons/fi';
 import adminApi from '@/lib/api';
+import ActionMenu from '@/components/ActionMenu';
 
 export default function AdminInventoryPage() {
   const [variants, setVariants] = useState([]);
@@ -54,7 +56,7 @@ export default function AdminInventoryPage() {
       <div className="admin-card p-0 overflow-hidden">
         {loading ? <div className="p-12 text-center"><span className="spinner mx-auto" /></div> : (
           <table className="admin-table">
-            <thead><tr><th>Product</th><th>Variant</th><th>SKU</th><th>Price</th><th>Stock</th><th>Threshold</th><th>Status</th><th>Actions</th></tr></thead>
+            <thead><tr><th>Product</th><th>Variant</th><th>SKU</th><th>Price</th><th>Stock</th><th>Threshold</th><th>Status</th><th className="text-right">Actions</th></tr></thead>
             <tbody>
               {variants.map((v) => {
                 const isLow = v.stock <= (v.lowStockThreshold || 5);
@@ -82,7 +84,16 @@ export default function AdminInventoryPage() {
                       </span>
                     </td>
                     <td>
-                      <button onClick={() => { setEditingStock(v._id); setNewStock(v.stock.toString()); }} className="text-sm text-info hover:underline">Update</button>
+                      {editingStock === v._id ? (
+                        <span className="text-xs text-muted">Editing</span>
+                      ) : (
+                        <ActionMenu
+                          label={`Open actions for ${v.name}`}
+                          actions={[
+                            { label: 'Update stock', icon: FiEdit2, onClick: () => { setEditingStock(v._id); setNewStock(v.stock.toString()); } },
+                          ]}
+                        />
+                      )}
                     </td>
                   </tr>
                 );

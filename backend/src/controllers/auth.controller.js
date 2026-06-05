@@ -2,7 +2,10 @@ const { User } = require('../models');
 const { generateTokenPair, verifyRefreshToken } = require('../utils/jwt');
 const { createOTP, verifyOTP: verifyOTPUtil } = require('../utils/otp');
 const { sendOTPEmail, sendPasswordResetEmail } = require('../utils/email');
+const { processImage } = require('../middleware/upload');
 const response = require('../utils/response');
+
+const ADMIN_ROLES = ['super_admin', 'manager', 'inventory_staff', 'content_manager'];
 
 /**
  * POST /api/auth/register
@@ -251,6 +254,60 @@ exports.resetPassword = async (req, res, next) => {
 };
 
 /**
+ * POST /api/auth/admin/forgot-password
+ */
+exports.adminForgotPassword = async (req, res, next) => {
+  try {
+    const { email } = req.body;
+
+    const user = await User.findOne({ email });
+    if (!user || !ADMIN_ROLES.includes(user.role)) {
+      return response.success(res, {}, 'If an admin account with this email exists, a reset code has been sent.');
+    }
+
+    const otp = createOTP();
+    user.otp = otp;
+    await user.save();
+
+    await sendPasswordResetEmail(email, otp.code, user.name);
+
+    return response.success(res, {}, 'If an admin account with this email exists, a reset code has been sent.');
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * POST /api/auth/admin/reset-password
+ */
+exports.adminResetPassword = async (req, res, next) => {
+  try {
+    const { email, otp, newPassword } = req.body;
+
+    const user = await User.findOne({ email }).select('+password');
+    if (!user || !ADMIN_ROLES.includes(user.role)) {
+      return response.badRequest(res, 'Invalid request');
+    }
+
+    const result = verifyOTPUtil(user.otp, otp);
+    if (!result.valid) {
+      user.otp.attempts = (user.otp.attempts || 0) + 1;
+      await user.save();
+      return response.badRequest(res, result.message);
+    }
+
+    user.password = newPassword;
+    user.otp = undefined;
+    user.refreshTokens = [];
+    await user.save();
+
+    return response.success(res, {}, 'Password reset successful. Please login with your new password.');
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
  * POST /api/auth/refresh-token
  */
 exports.refreshToken = async (req, res, next) => {
@@ -341,13 +398,38 @@ exports.getProfile = async (req, res) => {
  */
 exports.updateProfile = async (req, res, next) => {
   try {
-    const { name, phone } = req.body;
+    const { name, email, phone, avatar } = req.body;
 
     const updateData = {};
+    const unsetData = {};
     if (name) updateData.name = name;
-    if (phone) updateData.phone = phone;
+    if (email) {
+      const existingUser = await User.findOne({ email, _id: { $ne: req.user._id } });
+      if (existingUser) {
+        return response.badRequest(res, 'An account with this email already exists');
+      }
+      updateData.email = email;
+    }
+    if (phone !== undefined) {
+      if (phone) updateData.phone = phone;
+      else unsetData.phone = '';
+    }
+    if (avatar !== undefined) updateData.avatar = avatar;
+    if (req.file) {
+      const result = await processImage(
+        req.file.buffer,
+        'avatars',
+        `admin-${req.user._id}-${Date.now()}`,
+        { width: 500, height: 500, thumbnailWidth: 160, thumbnailHeight: 160, fit: 'cover' }
+      );
+      updateData.avatar = result.url;
+    }
 
-    const user = await User.findByIdAndUpdate(req.user._id, updateData, {
+    const update = {};
+    if (Object.keys(updateData).length) update.$set = updateData;
+    if (Object.keys(unsetData).length) update.$unset = unsetData;
+
+    const user = await User.findByIdAndUpdate(req.user._id, update, {
       new: true,
       runValidators: true,
     });
@@ -397,8 +479,7 @@ exports.adminLogin = async (req, res, next) => {
       return response.unauthorized(res, 'Invalid credentials');
     }
 
-    const adminRoles = ['super_admin', 'manager', 'inventory_staff', 'content_manager'];
-    if (!adminRoles.includes(user.role)) {
+    if (!ADMIN_ROLES.includes(user.role)) {
       return response.forbidden(res, 'Access denied. Admin privileges required.');
     }
 

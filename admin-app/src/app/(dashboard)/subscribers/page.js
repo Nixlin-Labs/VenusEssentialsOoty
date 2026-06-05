@@ -2,8 +2,10 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { toast } from 'sonner';
+import { FiRefreshCcw, FiTrash2, FiUserX } from 'react-icons/fi';
 import adminApi from '@/lib/api';
 import useConfirmStore from '@/store/useConfirmStore';
+import ActionMenu from '@/components/ActionMenu';
 
 export default function SubscribersPage() {
   const [subscribers, setSubscribers] = useState([]);
@@ -140,7 +142,7 @@ export default function SubscribersPage() {
                 <th>Source</th>
                 <th>Status</th>
                 <th>Subscribed On</th>
-                <th>Actions</th>
+                <th className="text-right">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -163,19 +165,20 @@ export default function SubscribersPage() {
                       day: 'numeric', month: 'short', year: 'numeric',
                     })}
                   </td>
-                  <td className="space-x-3">
-                    <button
-                      onClick={() => handleToggle(sub)}
-                      className={`text-sm hover:underline ${sub.isActive ? 'text-warning' : 'text-success'}`}
-                    >
-                      {sub.isActive ? 'Unsubscribe' : 'Reactivate'}
-                    </button>
-                    <button
-                      onClick={() => handleDelete(sub._id)}
-                      className="text-sm text-error hover:underline"
-                    >
-                      Delete
-                    </button>
+                  <td>
+                    <ActionMenu
+                      label={`Open actions for ${sub.email}`}
+                      actions={[
+                        {
+                          label: sub.isActive ? 'Unsubscribe' : 'Reactivate',
+                          icon: sub.isActive ? FiUserX : FiRefreshCcw,
+                          success: !sub.isActive,
+                          danger: sub.isActive,
+                          onClick: () => handleToggle(sub),
+                        },
+                        { label: 'Delete', icon: FiTrash2, danger: true, onClick: () => handleDelete(sub._id) },
+                      ]}
+                    />
                   </td>
                 </tr>
               ))}

@@ -2,8 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
+import { FiCheckCircle, FiThumbsDown, FiTrash2 } from 'react-icons/fi';
 import adminApi from '@/lib/api';
 import useConfirmStore from '@/store/useConfirmStore';
+import ActionMenu from '@/components/ActionMenu';
 
 export default function AdminReviewsPage() {
   const [reviews, setReviews] = useState([]);
@@ -84,15 +86,16 @@ export default function AdminReviewsPage() {
                   <span>{new Date(r.createdAt).toLocaleDateString('en-IN')}</span>
                 </div>
               </div>
-              <div className="flex flex-col gap-1.5">
-                {r.status === 'pending' && (
-                  <>
-                    <button onClick={() => handleModerate(r._id, 'approve')} className="admin-btn admin-btn-primary text-xs py-1.5">Approve</button>
-                    <button onClick={() => handleModerate(r._id, 'reject')} className="admin-btn admin-btn-danger text-xs py-1.5">Reject</button>
-                  </>
-                )}
-                <button onClick={() => handleDelete(r._id)} className="text-xs text-error hover:underline">Delete</button>
-              </div>
+              <ActionMenu
+                label={`Open actions for review ${r.title || r._id}`}
+                actions={[
+                  ...(r.status === 'pending' ? [
+                    { label: 'Approve', icon: FiCheckCircle, success: true, onClick: () => handleModerate(r._id, 'approve') },
+                    { label: 'Reject', icon: FiThumbsDown, danger: true, onClick: () => handleModerate(r._id, 'reject') },
+                  ] : []),
+                  { label: 'Delete', icon: FiTrash2, danger: true, onClick: () => handleDelete(r._id) },
+                ]}
+              />
             </div>
           </div>
         ))}
