@@ -86,8 +86,7 @@ const PORT = process.env.PORT || 5000;
 const startServer = async () => {
   await connectDB();
   app.listen(PORT, () => {
-    console.log(`🚀 Venus Essentials API running on port ${PORT}`);
-    console.log(`📦 Environment: ${process.env.NODE_ENV || 'development'}`);
+    console.log(`Venus Essentials API running on port http://localhost:${PORT}`);
   });
 };
 
