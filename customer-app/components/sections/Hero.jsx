@@ -24,7 +24,7 @@ export default function Hero() {
   useEffect(() => {
     const fetchBanners = async () => {
       try {
-        const { data } = await api.get('/banners?position=hero');
+        const { data } = await api.get('/cms/banners?position=hero');
         if (data?.data && data.data.length > 0) {
           setBanners(data.data);
         }

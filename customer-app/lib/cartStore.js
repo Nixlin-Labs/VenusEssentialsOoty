@@ -9,6 +9,8 @@ export const useCart = create()(
     (set, get) => ({
       items: defaultCartItems,
       isOpen: false,
+      coupon: null,
+      setCoupon: (coupon) => set({ coupon }),
       addItem: (item) => {
         const existing = get().items.find(
           (i) => i.productId === item.productId && i.variant === item.variant
@@ -69,14 +71,14 @@ export const useCart = create()(
           }));
         }
       },
-      clearCart: () => set({ items: [] }),
+      clearCart: () => set({ items: [], coupon: null }),
       openCart: () => set({ isOpen: true }),
       closeCart: () => set({ isOpen: false }),
     }),
     {
       name: 'venus-cart-store',
       storage: createJSONStorage(() => localStorage),
-      partialize: (state) => ({ items: state.items }),
+      partialize: (state) => ({ items: state.items, coupon: state.coupon }),
     }
   )
 );

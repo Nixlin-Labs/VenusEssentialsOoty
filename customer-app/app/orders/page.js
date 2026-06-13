@@ -251,6 +251,23 @@ export default function OrdersPage() {
   const markReviewed = (productId) =>
     setReviewed((prev) => ({ ...prev, [productId]: true }));
 
+  const handleDownloadInvoice = async (orderId, orderNumber) => {
+    try {
+      toast.loading('Downloading invoice...', { id: 'download-invoice' });
+      const response = await api.get(`/orders/${orderId}/invoice`, { responseType: 'blob' });
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `invoice_${orderNumber}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      link.parentNode.removeChild(link);
+      toast.success('Invoice downloaded', { id: 'download-invoice' });
+    } catch (error) {
+      toast.error('Failed to download invoice', { id: 'download-invoice' });
+    }
+  };
+
   const EmptySkeleton = () => (
     <div className="space-y-5">
       {[1, 2].map((i) => (
@@ -494,6 +511,20 @@ export default function OrdersPage() {
                                 </div>
                               </div>
                             )}
+
+                            {/* Download Invoice Button */}
+                            {isDelivered && (
+                              <div className="md:col-span-2 border-t border-surface-container pt-4">
+                                <button
+                                  type="button"
+                                  onClick={() => handleDownloadInvoice(order._id, order.orderNumber)}
+                                  className="inline-flex items-center gap-2 rounded-lg border border-outline-variant px-4 py-2 font-body text-sm text-charcoal transition-colors hover:border-primary hover:text-primary"
+                                >
+                                  <span className="material-symbols-outlined text-[18px]">receipt_long</span>
+                                  Download Invoice
+                                </button>
+                              </div>
+                            )}
                           </div>
                         </motion.div>
                       )}
@@ -501,9 +532,19 @@ export default function OrdersPage() {
 
                     {/* Order footer */}
                     <div className="flex items-center justify-between border-t border-surface-container bg-surface-container-low px-6 py-3">
-                      <p className="font-body text-xs text-on-surface-variant">
-                        {order.items?.length} item(s) · Payment: <span className="capitalize font-medium text-charcoal">{order.paymentStatus}</span>
-                      </p>
+                      <div className="font-body text-xs text-on-surface-variant flex items-center gap-2">
+                        <span>{order.items?.length} item(s)</span>
+                        <span className="w-1 h-1 rounded-full bg-outline-variant"></span>
+                        <span>Payment: </span>
+                        <span className={`inline-flex px-2 py-0.5 rounded-full capitalize font-semibold text-[10px] ${
+                          order.paymentStatus === 'paid' ? 'bg-primary/10 text-primary' :
+                          order.paymentStatus === 'failed' ? 'bg-error-container text-error' :
+                          order.paymentStatus === 'refunded' ? 'bg-surface-container text-outline' :
+                          'bg-tertiary-fixed/60 text-tertiary'
+                        }`}>
+                          {order.paymentStatus}
+                        </span>
+                      </div>
                       <button
                         onClick={() => setExpandedId(isExpanded ? null : order._id)}
                         className="font-body text-xs text-primary-container hover:underline"

@@ -19,17 +19,12 @@ export const footerLinks = {
   explore: [
     { label: "Shop All", href: "/shop" },
     { label: "Our Story", href: "/our-story" },
-    { label: "Wholesale", href: "/contact" },
-    { label: "Contact Us", href: "/contact" },
-  ],
-  connect: [
-    { label: "Wholesale", href: "/contact" },
     { label: "Contact Us", href: "/contact" },
   ],
   legal: [
-    { label: "Terms of Service", href: "#" },
-    { label: "Privacy Policy", href: "#" },
-    { label: "Shipping & Returns", href: "#" },
+    { label: "Terms of Service", href: "/terms" },
+    { label: "Privacy Policy", href: "/privacy" },
+    { label: "Shipping & Returns", href: "/shipping-returns" },
   ],
   ourValues: [{ label: "Sustainability", href: "#" }],
 };

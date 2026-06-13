@@ -37,25 +37,6 @@ function YoutubeIcon() {
 
 export default function Footer({ variant = "default" }) {
   const { settings } = useSettingsStore();
-
-  company_address: "Ooty, Tamil Nadu, India";
-  company_email: "elamaranvikki@gmail.com";
-  company_name: "Venus Essentials";
-  company_phone: "+919876543210";
-  currency: "INR";
-  default_gst_percentage: 18;
-  default_shipping_charge: 50;
-  facebook_url: "";
-  free_shipping_threshold: 500;
-  gst_number: "GSTNUM";
-  instagram_url: "";
-  invoice_prefix: "INV";
-  site_description: "Premium coffee, tea, essential oils and chocolates from the hills of Ooty. 40+ years of heritage wellness.";
-  site_title: "Venus Essentials - Premium Wellness from Ooty";
-  whatsapp_number: "+919876543210";
-  youtube_url: "";
-
-
   
   if (variant === "minimal") {
     return (
@@ -71,10 +52,10 @@ export default function Footer({ variant = "default" }) {
               </p>
             </div>
             <div className="flex flex-wrap gap-5 font-body text-[13px] text-on-surface-variant">
-              <Link href="#" className="hover:text-charcoal">
+              <Link href="/privacy" className="hover:text-charcoal">
                 Privacy Policy
               </Link>
-              <Link href="#" className="hover:text-charcoal">
+              <Link href="/shipping-returns" className="hover:text-charcoal">
                 Shipping & Returns
               </Link>
               <Link href="/contact" className="hover:text-charcoal">
@@ -83,7 +64,7 @@ export default function Footer({ variant = "default" }) {
               <Link href="/contact" className="font-medium text-charcoal">
                 Contact Us
               </Link>
-              <Link href="#" className="hover:text-charcoal">
+              <Link href="/our-story" className="hover:text-charcoal">
                 Sustainability
               </Link>
             </div>

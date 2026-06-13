@@ -239,6 +239,7 @@ export default function Navbar({ activeLink }) {
               className="text-on-surface-variant hover:text-charcoal"
               aria-label="Search"
               onClick={() => setIsSearchOpen(true)}
+              suppressHydrationWarning
             >
               <SearchIcon />
             </button>
@@ -249,6 +250,7 @@ export default function Navbar({ activeLink }) {
                   className="text-on-surface-variant hover:text-charcoal"
                   aria-label="Profile"
                   onClick={() => setProfileMenuOpen((prev) => !prev)}
+                  suppressHydrationWarning
                 >
                   <AccountIcon />
                 </button>
@@ -281,6 +283,7 @@ export default function Navbar({ activeLink }) {
                         type="button"
                         className="w-full px-2 py-2 text-sm text-left rounded-md text-on-surface-variant hover:bg-surface-container"
                         onClick={handleLogout}
+                        suppressHydrationWarning
                       >
                         Logout
                       </button>
@@ -294,6 +297,7 @@ export default function Navbar({ activeLink }) {
                 className="text-on-surface-variant hover:text-charcoal"
                 aria-label="Account"
                 onClick={() => openAuthModal("login")}
+                suppressHydrationWarning
               >
                 <AccountIcon />
               </button>
@@ -303,6 +307,7 @@ export default function Navbar({ activeLink }) {
               onClick={openCart}
               className="relative text-on-surface-variant hover:text-charcoal"
               aria-label="Open cart"
+              suppressHydrationWarning
             >
               <CartIcon />
               {totalItems > 0 && (
@@ -316,6 +321,7 @@ export default function Navbar({ activeLink }) {
               className="text-charcoal lg:hidden"
               onClick={() => setMobileOpen(true)}
               aria-label="Open menu"
+              suppressHydrationWarning
             >
               <MenuIcon />
             </button>

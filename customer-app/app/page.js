@@ -3,6 +3,7 @@ import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import Hero from '@/components/sections/Hero';
 import CuratedCollections from '@/components/sections/CuratedCollections';
+import PromotionalBanner from '@/components/sections/PromotionalBanner';
 import BestSellers from '@/components/sections/BestSellers';
 import VenusPromise from '@/components/sections/VenusPromise';
 import Testimonials from '@/components/sections/Testimonials';
@@ -15,6 +16,7 @@ export default function HomePage() {
       <main>
         <Hero />
         <CuratedCollections />
+        <PromotionalBanner />
         <BestSellers />
         <VenusPromise />
         <Testimonials />

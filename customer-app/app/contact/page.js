@@ -213,17 +213,26 @@ export default function ContactPage() {
                   </span>
                 </li>
               </ul>
-              <div className="relative mt-8 overflow-hidden rounded-xl">
-                <img
-                  src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&q=80"
-                  alt="Stylized map of Ooty region"
-                  className="object-cover w-full h-48"
-                />
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="flex items-center justify-center w-10 h-10 bg-white rounded-full shadow-md">
-                    <PinIcon />
-                  </div>
-                </div>
+              <div className="relative mt-8 overflow-hidden rounded-xl bg-surface-container-low min-h-[12rem] [&>iframe]:w-full [&>iframe]:h-full [&>iframe]:absolute [&>iframe]:inset-0">
+                {settings?.google_map_iframe ? (
+                  <div
+                    className="w-full h-64 md:h-72 [&>iframe]:w-full [&>iframe]:h-full [&>iframe]:border-0"
+                    dangerouslySetInnerHTML={{ __html: settings.google_map_iframe }}
+                  />
+                ) : (
+                  <>
+                    <img
+                      src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&q=80"
+                      alt="Stylized map of Ooty region"
+                      className="object-cover w-full h-48"
+                    />
+                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                      <div className="flex items-center justify-center w-10 h-10 bg-white rounded-full shadow-md">
+                        <PinIcon />
+                      </div>
+                    </div>
+                  </>
+                )}
               </div>
             </div>
           </div>

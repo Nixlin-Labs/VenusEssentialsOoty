@@ -7,7 +7,10 @@ const { generateUniqueSlug } = require('../utils/slugify');
 const { processImage, deleteFile } = require('../middleware/upload');
 const { createAuditLog } = require('../middleware/auditLogger');
 const { sendDispatchEmail, sendRefundEmail } = require('../utils/email');
+const { generateInvoicePDF } = require('../utils/invoice');
 const response = require('../utils/response');
+const path = require('path');
+const fs = require('fs');
 
 // ==================== DASHBOARD ====================
 
@@ -635,6 +638,28 @@ exports.moderateReview = async (req, res, next) => {
   } catch (error) { next(error); }
 };
 
+exports.deleteReview = async (req, res, next) => {
+  try {
+    const review = await Review.findById(req.params.id);
+    if (!review) return response.notFound(res, 'Review');
+
+    const productId = review.product;
+    await review.deleteOne();
+
+    // Recalculate product rating after deletion
+    const stats = await Review.aggregate([
+      { $match: { product: productId, status: 'approved' } },
+      { $group: { _id: null, avg: { $avg: '$rating' }, count: { $sum: 1 } } },
+    ]);
+    await Product.findByIdAndUpdate(productId, {
+      averageRating: stats[0] ? Math.round(stats[0].avg * 10) / 10 : 0,
+      totalReviews: stats[0] ? stats[0].count : 0,
+    });
+
+    return response.success(res, {}, 'Review deleted');
+  } catch (error) { next(error); }
+};
+
 // ==================== CMS PAGES ====================
 
 exports.getCmsPages = async (req, res, next) => {
@@ -715,52 +740,95 @@ exports.deleteBanner = async (req, res, next) => {
 
 // ==================== REPORTS ====================
 
-exports.getSalesReport = async (req, res, next) => {
+exports.getReports = async (req, res, next) => {
   try {
-    const { startDate, endDate, groupBy = 'day' } = req.query;
-    const match = { paymentStatus: 'paid' };
-    if (startDate) match.createdAt = { $gte: new Date(startDate) };
-    if (endDate) match.createdAt = { ...match.createdAt, $lte: new Date(endDate) };
+    const { type, from, to } = req.query;
+    
+    const match = {};
+    if (from) match.createdAt = { $gte: new Date(from) };
+    if (to) {
+      const toDate = new Date(to);
+      toDate.setHours(23, 59, 59, 999);
+      match.createdAt = { ...match.createdAt, $lte: toDate };
+    }
 
-    const groupFormat = groupBy === 'month' ? '%Y-%m' : '%Y-%m-%d';
-    const report = await Order.aggregate([
-      { $match: match },
-      { $group: {
-        _id: { $dateToString: { format: groupFormat, date: '$createdAt' } },
-        orders: { $sum: 1 },
-        revenue: { $sum: '$total' },
-        avgOrderValue: { $avg: '$total' },
-      }},
-      { $sort: { _id: 1 } },
-    ]);
+    if (type === 'sales') {
+      match.paymentStatus = 'paid';
+      const rows = await Order.aggregate([
+        { $match: match },
+        { $group: {
+          _id: { $dateToString: { format: '%Y-%m-%d', date: '$createdAt' } },
+          orders: { $sum: 1 },
+          revenue: { $sum: '$total' },
+          avgOrderValue: { $avg: '$total' },
+        }},
+        { $sort: { _id: -1 } },
+      ]);
+      
+      const formattedRows = rows.map(r => ({
+        Date: r._id,
+        Orders: r.orders,
+        Revenue: Math.round(r.revenue),
+        'Avg Value': Math.round(r.avgOrderValue),
+      }));
 
-    return response.success(res, { data: report });
-  } catch (error) { next(error); }
-};
+      const totalRevenue = rows.reduce((acc, r) => acc + r.revenue, 0);
+      const totalOrders = rows.reduce((acc, r) => acc + r.orders, 0);
+      
+      return response.success(res, { data: {
+        summary: {
+          TotalRevenue: Math.round(totalRevenue),
+          TotalOrders: totalOrders,
+          AvgOrderValue: totalOrders ? Math.round(totalRevenue / totalOrders) : 0,
+        },
+        rows: formattedRows
+      }});
 
-exports.getRevenueReport = async (req, res, next) => {
-  try {
-    const report = await Order.aggregate([
-      { $match: { paymentStatus: 'paid' } },
-      { $group: {
-        _id: null,
-        totalRevenue: { $sum: '$total' },
-        totalOrders: { $sum: 1 },
-        totalGST: { $sum: '$gst.total' },
-        totalShipping: { $sum: '$shippingCharge' },
-        totalDiscount: { $sum: '$discount' },
-        avgOrderValue: { $avg: '$total' },
-      }},
-    ]);
-    return response.success(res, { data: report[0] || {} });
-  } catch (error) { next(error); }
-};
+    } else if (type === 'products') {
+      const topProducts = await Product.find({ status: 'active' }).sort({ totalSold: -1 }).limit(50);
+      const rows = topProducts.map(p => ({
+        Product: p.name,
+        Price: p.price,
+        'Total Sold': p.totalSold,
+        Stock: p.stock || 0,
+        Rating: p.averageRating,
+      }));
+      return response.success(res, { data: { rows } });
 
-exports.getProductReport = async (req, res, next) => {
-  try {
-    const topProducts = await Product.find({ status: 'active' })
-      .sort({ totalSold: -1 }).limit(20).select('name totalSold averageRating images');
-    return response.success(res, { data: topProducts });
+    } else if (type === 'customers') {
+      const rows = await Order.aggregate([
+        { $match: { paymentStatus: 'paid', ...match } },
+        { $group: {
+          _id: '$user',
+          orders: { $sum: 1 },
+          spent: { $sum: '$total' }
+        }},
+        { $lookup: { from: 'users', localField: '_id', foreignField: '_id', as: 'user' } },
+        { $unwind: '$user' },
+        { $sort: { spent: -1 } },
+        { $limit: 50 }
+      ]);
+      const formattedRows = rows.map(r => ({
+        Customer: r.user.name,
+        Email: r.user.email,
+        Orders: r.orders,
+        'Total Spent': Math.round(r.spent)
+      }));
+      return response.success(res, { data: { rows: formattedRows } });
+
+    } else if (type === 'orders') {
+      const orders = await Order.find(match).sort({ createdAt: -1 }).limit(100);
+      const formattedRows = orders.map(o => ({
+        Order: o.orderNumber,
+        Date: o.createdAt.toISOString().split('T')[0],
+        Status: o.orderStatus,
+        Payment: o.paymentStatus,
+        Total: Math.round(o.total)
+      }));
+      return response.success(res, { data: { rows: formattedRows } });
+    }
+
+    return response.success(res, { data: { rows: [] } });
   } catch (error) { next(error); }
 };
 
@@ -837,6 +905,7 @@ exports.getSettings = async (req, res, next) => {
       storePhone: '',
       whatsapp: '',
       storeAddress: '',
+      googleMapIframe: '',
       gstNumber: '',
       shippingFreeAbove: 500,
       shippingCharge: 50,
@@ -855,6 +924,7 @@ exports.getSettings = async (req, res, next) => {
       company_phone: 'storePhone',
       whatsapp_number: 'whatsapp',
       company_address: 'storeAddress',
+      google_map_iframe: 'googleMapIframe',
       gst_number: 'gstNumber',
       free_shipping_threshold: 'shippingFreeAbove',
       default_shipping_charge: 'shippingCharge',
@@ -913,6 +983,11 @@ const settingsMap = {
     key: 'company_address',
     group: 'general',
     label: 'Company Address',
+  },
+  googleMapIframe: {
+    key: 'google_map_iframe',
+    group: 'contact',
+    label: 'Google Map Iframe',
   },
 
   // These already exist in DB
@@ -1198,4 +1273,27 @@ exports.getPayments = async (req, res, next) => {
     const result = await paginate(query, { page, limit, sort: { createdAt: -1 } });
     return response.success(res, { data: result.data, pagination: result.pagination });
   } catch (error) { next(error); }
+};
+
+/**
+ * GET /api/admin/orders/:id/invoice
+ */
+exports.downloadAdminInvoice = async (req, res, next) => {
+  try {
+    const order = await Order.findById(req.params.id);
+    if (!order) return response.notFound(res, 'Order');
+
+    // Generate invoice if not already generated
+    if (!order.invoicePath || !fs.existsSync(path.join(__dirname, '..', '..', order.invoicePath))) {
+      const invoiceData = await generateInvoicePDF(order);
+      order.invoiceNumber = invoiceData.invoiceNumber;
+      order.invoicePath = invoiceData.filePath;
+      await order.save();
+    }
+
+    const absolutePath = path.join(__dirname, '..', '..', order.invoicePath);
+    res.download(absolutePath, `${order.invoiceNumber}.pdf`);
+  } catch (error) {
+    next(error);
+  }
 };

@@ -6,7 +6,7 @@ import adminApi from '@/lib/api';
 
 export default function AdminSettingsPage() {
   const [settings, setSettings] = useState({
-    storeName: 'Venus Essentials', storeEmail: '', storePhone: '', whatsapp: '', storeAddress: '',
+    storeName: 'Venus Essentials', storeEmail: '', storePhone: '', whatsapp: '', storeAddress: '', googleMapIframe: '',
     gstNumber: '', shippingFreeAbove: 500, shippingCharge: 50,
     gstPercentage: 18, currency: 'INR',
     socialMedia: { instagram: '', facebook: '', youtube: '' },
@@ -52,6 +52,7 @@ export default function AdminSettingsPage() {
           <div><label className="block text-sm font-medium mb-1">Support Phone</label><input type="tel" className="admin-input" value={settings.storePhone} onChange={(e) => setSettings({ ...settings, storePhone: e.target.value })} /></div>
           <div><label className="block text-sm font-medium mb-1">WhatsApp Number</label><input type="tel" className="admin-input" value={settings.whatsapp || ''} onChange={(e) => setSettings({ ...settings, whatsapp: e.target.value })} placeholder="e.g. +919876543210" /></div>
           <div className="md:col-span-2"><label className="block text-sm font-medium mb-1">Physical Address</label><textarea rows="3" className="admin-input" value={settings.storeAddress || ''} onChange={(e) => setSettings({ ...settings, storeAddress: e.target.value })} /></div>
+          <div className="md:col-span-2"><label className="block text-sm font-medium mb-1">Google Map Iframe HTML</label><textarea rows="3" className="admin-input font-mono text-xs" value={settings.googleMapIframe || ''} onChange={(e) => setSettings({ ...settings, googleMapIframe: e.target.value })} placeholder='<iframe src="https://www.google.com/maps/embed?..." width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy"></iframe>' /></div>
         </div>
       </div>
 

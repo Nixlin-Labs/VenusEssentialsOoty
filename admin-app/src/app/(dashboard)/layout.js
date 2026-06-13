@@ -45,11 +45,10 @@ const menuItems = [
   { href: '/testimonials', label: 'Testimonials', icon: <FiMessageSquare /> },
   { href: '/subscribers', label: 'Subscribers', icon: <FiMail /> },
   { href: '/enquiries', label: 'Enquiries', icon: <FiMessageCircle /> },
-  { href: '/cms', label: 'CMS Pages', icon: <FiFileText /> },
   { href: '/banners', label: 'Banners', icon: <FiImage /> },
   { href: '/reports', label: 'Reports', icon: <FiBarChart2 /> },
   { href: '/settings', label: 'Settings', icon: <FiSettings /> },
-  { href: '/example-export', label: 'Demo Exports', icon: <FiDownload /> },
+  // { href: '/example-export', label: 'Demo Exports', icon: <FiDownload /> },
 ];
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || 'http://localhost:5000';

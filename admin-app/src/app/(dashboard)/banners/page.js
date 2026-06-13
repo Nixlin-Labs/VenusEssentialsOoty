@@ -186,9 +186,8 @@ export default function AdminBannersPage() {
                 value={formData.position}
                 onChange={(e) => setFormData({ ...formData, position: e.target.value })}
               >
-                <option value="hero">Hero</option>
-                <option value="promotional">Promo / Section</option>
-                <option value="category">Category</option>
+                <option value="hero">Hero (1920x800px)</option>
+                <option value="promotional">Promotional (1200x400px)</option>
               </select>
             </div>
             <div>
@@ -201,7 +200,9 @@ export default function AdminBannersPage() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1">Image</label>
+              <label className="block text-sm font-medium mb-1">
+                Image {formData.position === 'hero' ? '(Preferred: 1920x800px)' : '(Preferred: 1200x400px)'} *
+              </label>
               <input
                 type="file"
                 accept="image/*"

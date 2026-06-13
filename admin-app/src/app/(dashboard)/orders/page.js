@@ -57,6 +57,23 @@ export default function AdminOrdersPage() {
     }
   };
 
+  const handleDownloadInvoice = async (orderId, orderNumber) => {
+    try {
+      toast.loading('Downloading invoice...', { id: 'download-invoice' });
+      const response = await adminApi.get(`/admin/orders/${orderId}/invoice`, { responseType: 'blob' });
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `invoice_${orderNumber}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      link.parentNode.removeChild(link);
+      toast.success('Invoice downloaded', { id: 'download-invoice' });
+    } catch (error) {
+      toast.error('Failed to download invoice', { id: 'download-invoice' });
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -111,6 +128,8 @@ export default function AdminOrdersPage() {
                     <span className={`admin-badge ${
                       order.paymentStatus === 'paid' ? 'bg-success-bg text-success' :
                       order.paymentStatus === 'refunded' ? 'bg-charcoal-50 text-charcoal-500' :
+                      order.paymentStatus === 'failed' ? 'bg-error-bg text-error' :
+                      order.paymentStatus === 'pending' ? 'bg-warning-bg text-warning' :
                       'bg-warning-bg text-warning'
                     }`}>{order.paymentStatus}</span>
                   </td>
@@ -146,7 +165,17 @@ export default function AdminOrdersPage() {
                   <h3 className="text-lg font-bold text-charcoal-900">Order {selectedOrder.orderNumber}</h3>
                   <p className="text-sm text-muted">{new Date(selectedOrder.createdAt).toLocaleString('en-IN')}</p>
                 </div>
-                <button onClick={() => setSelectedOrder(null)} className="text-xl text-muted hover:text-charcoal-900">✕</button>
+                <div className="flex items-center gap-4">
+                  <button
+                    type="button"
+                    onClick={() => handleDownloadInvoice(selectedOrder._id, selectedOrder.orderNumber)}
+                    className="admin-btn admin-btn-secondary text-xs flex items-center gap-1"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 10v6m0 0l-3-3m3 3l3-3M3 17V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z" /></svg>
+                    Download Invoice
+                  </button>
+                  <button onClick={() => setSelectedOrder(null)} className="text-xl text-muted hover:text-charcoal-900">✕</button>
+                </div>
               </div>
 
               <div className="p-6 space-y-4">

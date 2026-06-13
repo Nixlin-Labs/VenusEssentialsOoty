@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useCart } from '@/lib/cartStore';
@@ -35,11 +35,14 @@ export default function CartDrawer() {
     };
   }, [isOpen]);
 
+  const [checkingOut, setCheckingOut] = useState(false);
+
   const handleCheckoutClick = () => {
     if (!isAuthenticated) {
       openAuthModal('login');
       return;
     }
+    setCheckingOut(true);
     closeCart();
     router.push('/checkout/information');
   };
@@ -178,9 +181,17 @@ export default function CartDrawer() {
                 <button
                   type="button"
                   onClick={handleCheckoutClick}
-                  className="mb-3 flex w-full items-center justify-center gap-2 rounded-md bg-primary-container py-4 font-body text-sm uppercase tracking-wider text-white transition-colors hover:bg-secondary"
+                  disabled={checkingOut}
+                  className="mb-3 flex w-full items-center justify-center gap-2 rounded-md bg-primary-container py-4 font-body text-sm uppercase tracking-wider text-white transition-colors hover:bg-secondary disabled:opacity-75 disabled:cursor-not-allowed"
                 >
-                  Proceed to Checkout →
+                  {checkingOut ? (
+                    <>
+                      <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                      Loading Checkout...
+                    </>
+                  ) : (
+                    'Proceed to Checkout →'
+                  )}
                 </button>
                 <button
                   type="button"

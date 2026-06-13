@@ -44,7 +44,7 @@ app.use(express.json({
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(cookieParser());
 app.use(morgan('dev'));
-app.use(generalLimiter);
+// app.use(generalLimiter);
 
 // --- Static files (uploads) ---
 app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads')));

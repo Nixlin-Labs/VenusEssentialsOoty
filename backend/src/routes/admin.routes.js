@@ -56,6 +56,7 @@ router.get('/inventory/low-stock', rbac('inventory:view'), adminController.getLo
 // ==================== ORDERS ====================
 router.get('/orders', rbac('order:view'), adminController.getOrders);
 router.get('/orders/:id', rbac('order:view'), adminController.getOrderById);
+router.get('/orders/:id/invoice', rbac('order:view'), adminController.downloadAdminInvoice);
 router.put('/orders/:id/status', rbac('order:update'), adminController.updateOrderStatus);
 router.post('/orders/:id/refund', rbac('order:refund'), adminController.processRefund);
 
@@ -76,6 +77,7 @@ router.delete('/coupons/:id', rbac('coupon:delete'), adminController.deleteCoupo
 // ==================== REVIEWS ====================
 router.get('/reviews', rbac('review:view'), adminController.getReviews);
 router.put('/reviews/:id/moderate', rbac('review:moderate'), adminController.moderateReview);
+router.delete('/reviews/:id', rbac('review:moderate'), adminController.deleteReview);
 
 // ==================== CMS PAGES ====================
 router.get('/cms/pages', rbac('cms:view'), adminController.getCmsPages);
@@ -90,9 +92,7 @@ router.put('/banners/:id', rbac('banner:edit'), upload.single('image'), adminCon
 router.delete('/banners/:id', rbac('banner:delete'), adminController.deleteBanner);
 
 // ==================== REPORTS ====================
-router.get('/reports/sales', rbac('report:view'), adminController.getSalesReport);
-router.get('/reports/revenue', rbac('report:view'), adminController.getRevenueReport);
-router.get('/reports/products', rbac('report:view'), adminController.getProductReport);
+router.get('/reports', rbac('report:view'), adminController.getReports);
 
 // ==================== ROLES ====================
 router.get('/roles', rbac('role:view'), adminController.getRoles);

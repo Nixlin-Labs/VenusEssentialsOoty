@@ -28,12 +28,26 @@ export default function CheckoutPaymentPage() {
 
   const selectedAddress = addresses.find((a) => a.id === selectedAddressId || a._id === selectedAddressId) || addresses[0];
 
+  const coupon = useCart((state) => state.coupon);
+
   const subtotal = useMemo(
     () => cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0),
     [cartItems]
   );
-  const shipping = subtotal > 0 ? 150 : 0;
-  const total = subtotal + shipping;
+
+  const discountAmount = useMemo(() => {
+    if (!coupon) return 0;
+    if (coupon.type === 'flat') {
+      return coupon.value;
+    } else if (coupon.type === 'percentage') {
+      return (subtotal * coupon.value) / 100;
+    }
+    return 0;
+  }, [coupon, subtotal]);
+
+  const isFreeShipping = (coupon && coupon.freeShipping) || subtotal >= 500;
+  const shipping = subtotal > 0 && !isFreeShipping ? 150 : 0;
+  const total = Math.max(0, subtotal - discountAmount + shipping);
 
   const checkoutItems = cartItems.map((item) => ({
     name: item.name,
@@ -91,6 +105,7 @@ export default function CheckoutPaymentPage() {
       const payload = {
         items: mappedItems,
         shippingAddress: mappedShippingAddress,
+        couponCode: coupon?.code || undefined,
       };
 
       const { data } = await api.post('/payments/create-order', payload);
@@ -103,7 +118,7 @@ export default function CheckoutPaymentPage() {
       }
 
       const options = {
-        key: order.keyId || process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+        key: order.keyId,
         amount: Math.round(order.amount * 100),
         currency: 'INR',
         name: 'Venus Essentials',
@@ -133,9 +148,17 @@ export default function CheckoutPaymentPage() {
           color: '#2d4739', // primary color
         },
         modal: {
-          ondismiss: () => {
+          ondismiss: async () => {
             setIsProcessing(false);
             setError('Payment cancelled. Please try again.');
+            try {
+              await api.post('/payments/failed', {
+                razorpay_order_id: order.razorpayOrderId,
+                error: { description: 'Payment modal closed by user' },
+              });
+            } catch (err) {
+              console.error('Failed to report payment cancellation', err);
+            }
           },
         },
       };

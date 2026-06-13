@@ -386,6 +386,100 @@ export default function ProductPage({ params }) {
             </div>
           </div>
 
+          {/* Reviews Section */}
+          {product.reviews && product.reviews.length > 0 && (() => {
+            const timeAgo = (dateStr) => {
+              const date = new Date(dateStr);
+              const now = new Date();
+              const diff = Math.floor((now - date) / 1000);
+              
+              if (diff < 60) return 'Just now';
+              if (diff < 3600) return `${Math.floor(diff / 60)} minute${Math.floor(diff / 60) > 1 ? 's' : ''} ago`;
+              if (diff < 86400) return `${Math.floor(diff / 3600)} hour${Math.floor(diff / 3600) > 1 ? 's' : ''} ago`;
+              if (diff < 2592000) return `${Math.floor(diff / 86400)} day${Math.floor(diff / 86400) > 1 ? 's' : ''} ago`;
+              if (diff < 31536000) return `${Math.floor(diff / 2592000)} month${Math.floor(diff / 2592000) > 1 ? 's' : ''} ago`;
+              return `${Math.floor(diff / 31536000)} year${Math.floor(diff / 31536000) > 1 ? 's' : ''} ago`;
+            };
+
+            const sortedReviews = [...product.reviews];
+
+            return (
+              <section className="mt-20 pt-10">
+                <h2 className="font-display text-[28px] text-charcoal mb-6">
+                  Review List
+                </h2>
+                
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-outline-variant/40">
+                  <span className="font-body text-[15px] text-on-surface-variant">
+                    Showing 1-{sortedReviews.length} of {product.totalReviews || sortedReviews.length} results
+                  </span>
+                  <div className="flex items-center gap-3">
+                    <span className="font-body text-[15px] text-on-surface-variant">Sort by :</span>
+                    <div className="relative">
+                      {/* Sort functionality can be added to this select by moving state higher, but visually matching for now */}
+                      <select className="appearance-none border border-outline-variant/50 rounded-full pl-5 pr-10 py-2.5 font-body text-[14px] text-charcoal bg-transparent focus:outline-none focus:border-secondary cursor-pointer">
+                        <option value="newest">Newest</option>
+                        <option value="highest">Highest Rating</option>
+                        <option value="lowest">Lowest Rating</option>
+                      </select>
+                      <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant" style={{ fontSize: '20px' }}>
+                        expand_more
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex flex-col">
+                  {sortedReviews.map((review) => (
+                    <div key={review._id} className="py-8 border-b border-outline-variant/30 last:border-0">
+                      <div className="flex items-start justify-between mb-5">
+                        <div className="flex items-center gap-4">
+                          <div className="h-[50px] w-[50px] rounded-full bg-surface-container overflow-hidden flex items-center justify-center font-display text-xl text-primary border border-outline-variant/20 shadow-sm">
+                            {review.user?.name ? review.user.name.charAt(0).toUpperCase() : 'V'}
+                          </div>
+                          <div>
+                            <h4 className="font-display text-[17px] text-charcoal">{review.user?.name || 'Verified Buyer'}</h4>
+                            <span className="font-body text-[13.5px] text-on-surface-variant/80">(Verified)</span>
+                          </div>
+                        </div>
+                        <span className="font-body text-[14px] text-on-surface-variant">
+                          {timeAgo(review.createdAt)}
+                        </span>
+                      </div>
+
+                      {review.title && (
+                        <h5 className="font-display text-[17px] text-charcoal font-medium mb-2.5">
+                          {review.title}
+                        </h5>
+                      )}
+
+                      <p className="font-body text-[15.5px] leading-[1.7] text-on-surface-variant mb-4 max-w-5xl">
+                        {review.comment}
+                      </p>
+
+                      <div className="flex items-center gap-2.5">
+                        <div className="flex gap-0.5">
+                          {Array.from({ length: 5 }).map((_, i) => (
+                            <span
+                              key={i}
+                              className={`material-symbols-outlined ${i < review.rating ? 'filled text-sand' : 'text-outline-variant/30'}`}
+                              style={{ fontSize: '18px' }}
+                            >
+                              star
+                            </span>
+                          ))}
+                        </div>
+                        <span className="font-body text-sm text-on-surface-variant font-medium">
+                          {review.rating.toFixed(1)}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </section>
+            );
+          })()}
+
           {/* Related Products */}
           {related.length > 0 && (
             <section className="mt-20 border-t border-outline-variant pt-16">

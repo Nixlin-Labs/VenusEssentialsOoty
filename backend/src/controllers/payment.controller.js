@@ -290,21 +290,17 @@ exports.handleFailedPayment = async (req, res, next) => {
 
     const payment = await Payment.findOne({ razorpayOrderId: razorpay_order_id });
     if (payment) {
-      payment.status = 'failed';
-      payment.errorCode = paymentError?.code || '';
-      payment.errorDescription = paymentError?.description || 'Payment failed';
-      await payment.save();
-
-      // Update order status
-      const order = await Order.findById(payment.order);
-      if (order && order.paymentStatus !== 'paid') {
-        order.paymentStatus = 'failed';
-        order.statusHistory.push({ status: 'pending_payment', note: `Payment failed: ${paymentError?.description || 'Unknown error'}` });
-        await order.save();
+      if (payment.status !== 'captured') {
+        const orderId = payment.order;
+        // Delete the payment and order since payment failed/cancelled
+        await Payment.findByIdAndDelete(payment._id);
+        if (orderId) {
+          await Order.findByIdAndDelete(orderId);
+        }
       }
     }
 
-    return response.success(res, {}, 'Payment failure recorded');
+    return response.success(res, {}, 'Payment failure recorded and order deleted');
   } catch (error) {
     next(error);
   }
@@ -368,19 +364,11 @@ exports.handleWebhook = async (req, res, next) => {
 
       const payment = await Payment.findOne({ razorpayOrderId });
       if (payment && payment.status !== 'captured') {
-        payment.status = 'failed';
-        payment.errorCode = paymentEntity.error_code || '';
-        payment.errorDescription = paymentEntity.error_description || 'Payment failed';
-        await payment.save();
-
-        const order = await Order.findById(payment.order);
-        if (order && order.paymentStatus !== 'paid') {
-          order.paymentStatus = 'failed';
-          order.statusHistory.push({
-            status: 'pending_payment',
-            note: `Payment failed via webhook: ${paymentEntity.error_description || 'Unknown error'}`
-          });
-          await order.save();
+        const orderId = payment.order;
+        // Delete the payment and order since payment failed via webhook
+        await Payment.findByIdAndDelete(payment._id);
+        if (orderId) {
+          await Order.findByIdAndDelete(orderId);
         }
       }
     }

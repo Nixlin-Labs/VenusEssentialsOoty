@@ -46,6 +46,12 @@ export default function CheckoutInformationPage() {
     }
   }, [user]);
 
+  useEffect(() => {
+    if (addresses.length === 0) {
+      setUseNewAddress(true);
+    }
+  }, [addresses]);
+
   const subtotal = useMemo(
     () => cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0),
     [cartItems],
@@ -113,40 +119,50 @@ export default function CheckoutInformationPage() {
                     Shipping address
                   </h2>
                   <div className="space-y-4">
-                    {addresses.map((address) => (
-                      <label
-                        key={address.id}
-                        className="flex cursor-pointer items-start gap-3 rounded-md border border-outline-variant p-3"
-                      >
-                        <input
-                          type="radio"
-                          checked={selectedAddressId === address.id}
-                          onChange={() => {
-                            selectAddress(address.id);
-                            setUseNewAddress(false);
-                          }}
-                          className="mt-1 accent-primary-container"
-                        />
-                        <span className="text-sm text-on-surface-variant">
-                          <strong className="text-charcoal">
-                            {address.label}
-                          </strong>{" "}
-                          · {address.fullName}, {address.mobile}
-                          <br />
-                          {address.line1}
-                          {address.line2 ? `, ${address.line2}` : ""},{" "}
-                          {address.city}, {address.state} - {address.pincode}
-                        </span>
-                      </label>
-                    ))}
+                    {addresses.length === 0 ? (
+                      <div className="rounded-lg border border-dashed border-outline-variant p-6 text-center bg-surface-container-low mb-4">
+                        <span className="material-symbols-outlined text-[36px] text-on-surface-variant mb-2">location_on</span>
+                        <p className="font-body text-sm font-semibold text-charcoal mb-1">No Saved Addresses Found</p>
+                        <p className="font-body text-xs text-on-surface-variant">Please fill out the form below to add your shipping address.</p>
+                      </div>
+                    ) : (
+                      addresses.map((address) => (
+                        <label
+                          key={address.id}
+                          className="flex cursor-pointer items-start gap-3 rounded-md border border-outline-variant p-3"
+                        >
+                          <input
+                            type="radio"
+                            checked={selectedAddressId === address.id}
+                            onChange={() => {
+                              selectAddress(address.id);
+                              setUseNewAddress(false);
+                            }}
+                            className="mt-1 accent-primary-container"
+                          />
+                          <span className="text-sm text-on-surface-variant">
+                            <strong className="text-charcoal">
+                              {address.label}
+                            </strong>{" "}
+                            · {address.fullName}, {address.mobile}
+                            <br />
+                            {address.line1}
+                            {address.line2 ? `, ${address.line2}` : ""},{" "}
+                            {address.city}, {address.state} - {address.pincode}
+                          </span>
+                        </label>
+                      ))
+                    )}
 
-                    <button
-                      type="button"
-                      className="text-sm text-primary-container underline"
-                      onClick={() => setUseNewAddress((prev) => !prev)}
-                    >
-                      {useNewAddress ? "Cancel new address" : "Use new address"}
-                    </button>
+                    {addresses.length > 0 && (
+                      <button
+                        type="button"
+                        className="text-sm text-primary-container underline"
+                        onClick={() => setUseNewAddress((prev) => !prev)}
+                      >
+                        {useNewAddress ? "Cancel new address" : "Use new address"}
+                      </button>
+                    )}
 
                     {useNewAddress && (
                       <div className="space-y-4 rounded-md border border-outline-variant p-4">
