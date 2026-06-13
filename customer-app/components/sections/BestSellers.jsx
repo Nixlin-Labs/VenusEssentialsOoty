@@ -25,7 +25,7 @@ export default function BestSellers() {
           `/products?showInBestSellers=true&limit=8&sort=newest&page=${currentPage}`
         );
         if (data?.data) {
-          setBestSellers(data.data); // ✅ Bug 1 fixed: removed client-side .filter()
+          setBestSellers(data.data);
           setPagination(
             data.pagination || {
               page: 1,
@@ -51,21 +51,22 @@ export default function BestSellers() {
 
   return (
     <section id="best-sellers" className="section-spacing bg-surface">
-      <div className="container-main">
+      <div className="mx-auto max-w-container-max px-margin-mobile md:px-margin-desktop">
+
         {/* Heading */}
-        <div className="mb-12 text-center">
-          <p className="font-body text-xs font-semibold uppercase tracking-[0.25em] text-sand">
+        <div className="mb-10 text-center">
+          <p className="font-body text-xs font-semibold uppercase tracking-[0.25em] text-sand mb-3">
             Favorites
           </p>
-          <h2 className="mt-3 font-display text-3xl text-charcoal md:text-4xl">
+          <h2 className="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-primary mb-3">
             Our Best Sellers
           </h2>
-          <p className="mx-auto mt-3 max-w-md font-body text-[15px] text-on-surface-variant">
+          <p className="mx-auto max-w-md font-body-md text-body-md text-on-surface-variant">
             Customer favorites, handcrafted in small batches from Nilgiri botanicals.
           </p>
         </div>
 
-        {/* Grid */}
+        {/* Product Grid */}
         {loading ? (
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {[...Array(4)].map((_, idx) => (
@@ -73,7 +74,7 @@ export default function BestSellers() {
             ))}
           </div>
         ) : bestSellers.length === 0 ? (
-          <p className="py-12 text-center text-on-surface-variant">
+          <p className="py-12 text-center text-on-surface-variant font-body">
             No best sellers available right now.
           </p>
         ) : (
@@ -100,7 +101,7 @@ export default function BestSellers() {
             <button
               onClick={() => goToPage(currentPage - 1)}
               disabled={!pagination.hasPrevPage}
-              className="flex items-center gap-1.5 rounded-full border border-border px-5 py-2 font-body text-sm text-charcoal transition-all duration-200 hover:border-primary-container hover:text-primary-container disabled:cursor-not-allowed disabled:opacity-40"
+              className="flex items-center gap-1.5 rounded-full border border-outline-variant px-5 py-2 font-body text-sm text-on-surface-variant transition-all duration-200 hover:border-primary hover:text-primary disabled:cursor-not-allowed disabled:opacity-40"
             >
               <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>
                 arrow_back
@@ -114,10 +115,11 @@ export default function BestSellers() {
                 <button
                   key={page}
                   onClick={() => goToPage(page)}
-                  className={`h-9 w-9 rounded-full font-body text-sm transition-all duration-200 ${page === currentPage
-                      ? 'bg-primary-container text-white'
-                      : 'border border-border text-charcoal hover:border-primary-container hover:text-primary-container'
-                    }`}
+                  className={`h-9 w-9 rounded-full font-body text-sm transition-all duration-200 ${
+                    page === currentPage
+                      ? 'bg-primary text-on-primary shadow-botanical'
+                      : 'border border-outline-variant text-on-surface-variant hover:border-primary hover:text-primary'
+                  }`}
                 >
                   {page}
                 </button>
@@ -128,7 +130,7 @@ export default function BestSellers() {
             <button
               onClick={() => goToPage(currentPage + 1)}
               disabled={!pagination.hasNextPage}
-              className="flex items-center gap-1.5 rounded-full border border-border px-5 py-2 font-body text-sm text-charcoal transition-all duration-200 hover:border-primary-container hover:text-primary-container disabled:cursor-not-allowed disabled:opacity-40"
+              className="flex items-center gap-1.5 rounded-full border border-outline-variant px-5 py-2 font-body text-sm text-on-surface-variant transition-all duration-200 hover:border-primary hover:text-primary disabled:cursor-not-allowed disabled:opacity-40"
             >
               Next
               <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>
@@ -148,7 +150,7 @@ export default function BestSellers() {
         >
           <Link
             href="/shop"
-            className="inline-flex items-center gap-2 rounded-full border border-primary-container px-8 py-3 font-body text-sm text-primary-container transition-all duration-300 hover:bg-primary-container hover:text-white"
+            className="inline-flex items-center gap-2 rounded-full border border-primary px-8 py-3 font-body text-sm text-primary transition-all duration-300 hover:bg-primary hover:text-on-primary"
           >
             View All Products
             <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>

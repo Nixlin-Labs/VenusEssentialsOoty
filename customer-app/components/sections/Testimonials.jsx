@@ -95,13 +95,14 @@ export default function Testimonials() {
         }}
       />
 
-      <div className="relative container-main">
+      <div className="relative mx-auto max-w-container-max px-margin-mobile md:px-margin-desktop">
+
         {/* Section heading */}
-        <div className="mb-12 text-center">
-          <p className="font-body text-xs font-semibold uppercase tracking-[0.25em] text-sand">
+        <div className="mb-10 text-center">
+          <p className="font-body text-xs font-semibold uppercase tracking-[0.25em] text-sand mb-3">
             Reviews
           </p>
-          <h2 className="mt-3 text-3xl text-white font-display md:text-4xl">
+          <h2 className="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-primary">
             From Our Nilgiri Community
           </h2>
         </div>
@@ -139,13 +140,13 @@ export default function Testimonials() {
                 >
                   <div className="flex justify-center mb-6">{QUOTE_ICON}</div>
                   <StarRow rating={t.rating} />
-                  <p className="mt-6 text-xl leading-relaxed font-display text-white/90 md:text-2xl">
+                  <p className="mt-6 text-xl leading-relaxed font-display text-on-primary/90 md:text-2xl">
                     &ldquo;{t.text}&rdquo;
                   </p>
                   <div className="mt-8">
                     <p className="text-sm font-semibold font-body text-sand">{t.name}</p>
                     {t.location && (
-                      <p className="mt-1 text-xs font-body text-white/50">{t.location}</p>
+                      <p className="mt-1 text-xs font-body text-on-primary/50">{t.location}</p>
                     )}
                   </div>
                 </motion.div>
@@ -157,7 +158,7 @@ export default function Testimonials() {
                   type="button"
                   onClick={prev}
                   aria-label="Previous testimonial"
-                  className="flex items-center justify-center w-10 h-10 transition-all border rounded-full border-white/20 text-white/60 hover:border-white/50 hover:text-white"
+                  className="flex items-center justify-center w-10 h-10 transition-all border rounded-full border-on-primary/20 text-on-primary/60 hover:border-on-primary/50 hover:text-on-primary"
                 >
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
                     <path d="M15 18l-6-6 6-6" />
@@ -172,7 +173,7 @@ export default function Testimonials() {
                       onClick={() => setActive(i)}
                       aria-label={`Go to testimonial ${i + 1}`}
                       className={`h-1.5 rounded-full transition-all duration-300 ${
-                        i === active ? 'w-8 bg-sand' : 'w-1.5 bg-white/30'
+                        i === active ? 'w-8 bg-sand' : 'w-1.5 bg-on-primary/30'
                       }`}
                     />
                   ))}
@@ -182,7 +183,7 @@ export default function Testimonials() {
                   type="button"
                   onClick={next}
                   aria-label="Next testimonial"
-                  className="flex items-center justify-center w-10 h-10 transition-all border rounded-full border-white/20 text-white/60 hover:border-white/50 hover:text-white"
+                  className="flex items-center justify-center w-10 h-10 transition-all border rounded-full border-on-primary/20 text-on-primary/60 hover:border-on-primary/50 hover:text-on-primary"
                 >
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
                     <path d="M9 18l6-6-6-6" />

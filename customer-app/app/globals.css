@@ -35,10 +35,10 @@
 
   /* Unified section spacing with CSS variables for easy global control */
   .section-spacing {
-    --section-py-desktop: 60px;
-    --section-py-laptop: 50px;
-    --section-py-tablet: 40px;
-    --section-py-mobile: 28px;
+    --section-py-desktop: 80px;
+    --section-py-laptop: 64px;
+    --section-py-tablet: 48px;
+    --section-py-mobile: 36px;
 
     @apply py-[var(--section-py-mobile)] md:py-[var(--section-py-tablet)] lg:py-[var(--section-py-laptop)] xl:py-[var(--section-py-desktop)];
   }
