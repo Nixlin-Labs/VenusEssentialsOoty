@@ -186,9 +186,8 @@ export default function Hero() {
                 key={idx}
                 type="button"
                 onClick={() => setCurrentSlide(idx)}
-                className={`h-2 rounded-full transition-all duration-300 ${
-                  currentSlide === idx ? 'w-8 bg-primary' : 'w-2 bg-primary/20'
-                }`}
+                className={`h-2 rounded-full transition-all duration-300 ${currentSlide === idx ? 'w-8 bg-primary' : 'w-2 bg-primary/20'
+                  }`}
                 aria-label={`Go to slide ${idx + 1}`}
               />
             ))}
