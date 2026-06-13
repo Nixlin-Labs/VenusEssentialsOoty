@@ -67,8 +67,10 @@ export default function Newsletter() {
         </svg>
       </div>
 
-      <div className="relative z-10 container-main">
+      <div className="relative z-10 mx-auto max-w-container-max px-margin-mobile md:px-margin-desktop">
         <div className="max-w-xl mx-auto text-center">
+
+          {/* Icon */}
           <span
             className="material-symbols-outlined text-sand"
             style={{ fontSize: '40px' }}
@@ -76,10 +78,14 @@ export default function Newsletter() {
             local_florist
           </span>
 
-          <h2 className="mt-4 text-3xl font-display text-charcoal md:text-4xl">
+          {/* Heading */}
+          <p className="font-body text-xs font-semibold uppercase tracking-[0.25em] text-sand mt-4 mb-3">
+            Stay Connected
+          </p>
+          <h2 className="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-primary mb-4">
             Join the Nilgiri Circle
           </h2>
-          <p className="mx-auto mt-4 max-w-md font-body text-[15px] leading-relaxed text-on-surface-variant">
+          <p className="mx-auto max-w-md font-body-md text-body-md leading-relaxed text-on-surface-variant">
             Receive seasonal wellness rituals, early access to new collections, and stories from
             our Ooty workshop straight to your inbox.
           </p>
@@ -96,8 +102,8 @@ export default function Newsletter() {
                     : 'bg-primary/10 text-primary'
                 }`}
               >
-                <span 
-                  className={`material-symbols-outlined filled ${alreadySubscribed ? 'text-amber-500' : 'text-secondary'}`} 
+                <span
+                  className={`material-symbols-outlined filled ${alreadySubscribed ? 'text-amber-500' : 'text-secondary'}`}
                   style={{ fontSize: '20px' }}
                 >
                   {alreadySubscribed ? 'info' : 'check_circle'}
@@ -125,11 +131,11 @@ export default function Newsletter() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="py-3 text-sm tracking-wider text-white uppercase transition-colors rounded-full shrink-0 bg-primary-container px-7 font-body hover:bg-secondary disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  className="py-3 text-sm tracking-wider text-on-primary uppercase transition-colors rounded-full shrink-0 bg-primary px-7 font-body hover:bg-primary-container disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
                   {loading ? (
                     <>
-                      <span className="h-4 w-4 rounded-full border-2 border-white border-t-transparent animate-spin" />
+                      <span className="h-4 w-4 rounded-full border-2 border-on-primary border-t-transparent animate-spin" />
                       Subscribing…
                     </>
                   ) : 'Subscribe'}
@@ -142,7 +148,7 @@ export default function Newsletter() {
             <motion.p
               initial={{ opacity: 0, y: 4 }}
               animate={{ opacity: 1, y: 0 }}
-              className="mt-3 text-sm text-red-500 font-body"
+              className="mt-3 text-sm text-error font-body"
             >
               {error}
             </motion.p>

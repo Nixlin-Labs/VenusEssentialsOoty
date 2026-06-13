@@ -37,22 +37,18 @@ export default function CuratedCollections() {
     return (
       <section className="section-spacing">
         <div className="mx-auto max-w-container-max px-margin-mobile md:px-margin-desktop">
-          <div className="text-center mb-section-gap-mobile animate-pulse">
-            <h2 className="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-primary mb-stack-sm">
-              Curated Collections
-            </h2>
-            <div className="w-64 h-4 mx-auto mt-2 rounded bg-neutral-200" />
+          {/* Heading skeleton */}
+          <div className="text-center mb-10 animate-pulse">
+            <div className="w-32 h-3 mx-auto mb-4 rounded-full bg-neutral-200" />
+            <div className="w-64 h-8 mx-auto rounded bg-neutral-200" />
+            <div className="w-48 h-4 mx-auto mt-3 rounded bg-neutral-200" />
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-gutter auto-rows-[250px] md:auto-rows-[300px]">
-            <div className="relative flex flex-col justify-end p-8 rounded-lg md:col-span-2 md:row-span-2 bg-neutral-200/60 animate-pulse">
-              <div className="w-1/3 h-6 mb-2 rounded bg-neutral-300" />
-              <div className="w-1/4 h-4 rounded bg-neutral-300" />
-            </div>
-            <div className="relative flex flex-col justify-end p-6 rounded-lg bg-neutral-200/60 animate-pulse">
-              <div className="w-1/2 h-5 rounded bg-neutral-300" />
-            </div>
-            <div className="relative flex flex-col justify-end p-6 rounded-lg bg-neutral-200/60 animate-pulse">
-              <div className="w-1/2 h-5 rounded bg-neutral-300" />
+          {/* Grid skeleton */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-gutter">
+            <div className="relative rounded-xl md:col-span-2 bg-neutral-200/60 animate-pulse h-[340px] md:h-[480px]" />
+            <div className="grid grid-cols-1 gap-gutter">
+              <div className="relative rounded-xl bg-neutral-200/60 animate-pulse h-[180px] md:h-[220px]" />
+              <div className="relative rounded-xl bg-neutral-200/60 animate-pulse h-[180px] md:h-[220px]" />
             </div>
           </div>
         </div>
@@ -63,13 +59,13 @@ export default function CuratedCollections() {
   const hasAnyCard = cards['1'] || cards['2'] || cards['3'];
   if (!hasAnyCard) return null;
 
-  const CardOverlay = ({ cat, className, large = false }) => {
-    if (!cat) return <div className={`${className} bg-surface-container-low rounded-lg`} />;
+  const CardOverlay = ({ cat, large = false, className = '' }) => {
+    if (!cat) return <div className={`${className} bg-surface-container-low rounded-xl`} />;
 
     return (
       <Link
         href={`/shop?category=${cat.slug}`}
-        className={`group relative overflow-hidden rounded-lg bg-surface-container-low block ${className}`}
+        className={`group relative overflow-hidden rounded-xl bg-surface-container-low block ${className}`}
       >
         {getImageUrl(cat.image?.url) ? (
           <img
@@ -82,15 +78,29 @@ export default function CuratedCollections() {
             <span className="material-symbols-outlined text-outline" style={{ fontSize: '48px' }}>category</span>
           </div>
         )}
-        <div className={`absolute inset-0 ${large ? 'bg-gradient-to-t from-primary/80 via-primary/20 to-transparent' : 'bg-gradient-to-t from-primary/70 to-transparent'}`} />
-        <div className={`absolute bottom-0 left-0 w-full ${large ? 'p-stack-lg' : 'p-stack-md'}`}>
-          <h3 className={`text-on-primary mb-stack-sm ${large ? 'font-headline-sm text-headline-sm' : 'font-headline-sm text-headline-sm'}`}>
+
+        {/* Gradient overlay */}
+        <div
+          className={`absolute inset-0 ${
+            large
+              ? 'bg-gradient-to-t from-primary/85 via-primary/25 to-transparent'
+              : 'bg-gradient-to-t from-primary/75 via-primary/10 to-transparent'
+          }`}
+        />
+
+        {/* Text */}
+        <div className={`absolute bottom-0 left-0 w-full ${large ? 'p-8' : 'p-5'}`}>
+          <h3
+            className={`text-on-primary font-display mb-2 ${
+              large ? 'text-2xl md:text-3xl' : 'text-lg md:text-xl'
+            }`}
+          >
             {cat.name}
           </h3>
           {large && (
-            <p className="flex items-center transition-transform duration-300 font-body-sm text-body-sm text-on-primary/90 group-hover:translate-x-2">
+            <p className="flex items-center gap-1.5 text-sm font-body text-on-primary/80 transition-transform duration-300 group-hover:translate-x-1.5">
               Shop Category
-              <span className="ml-2 text-sm material-symbols-outlined">arrow_forward</span>
+              <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
             </p>
           )}
         </div>
@@ -101,28 +111,40 @@ export default function CuratedCollections() {
   return (
     <section className="section-spacing">
       <div className="mx-auto max-w-container-max px-margin-mobile md:px-margin-desktop">
-        <div className="text-center mb-section-gap-mobile">
-          <h2 className="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-primary mb-stack-sm">
+
+        {/* Section heading */}
+        <div className="text-center mb-10">
+          <p className="font-body text-xs font-semibold uppercase tracking-[0.25em] text-sand mb-3">
+            Shop by Category
+          </p>
+          <h2 className="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-primary mb-3">
             Curated Collections
           </h2>
-          <p className="font-body-md text-body-md text-on-surface-variant">
+          <p className="font-body-md text-body-md text-on-surface-variant max-w-md mx-auto">
             Elevate your daily rituals with nature&apos;s finest.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-gutter auto-rows-[250px] md:auto-rows-[300px]">
-          {/* Position 1: Left large card */}
+        {/* Bento-style grid — large card left, 2 stacked right */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-gutter">
+          {/* Large card — spans 2 cols */}
           <CardOverlay
             cat={cards['1']}
-            className="md:col-span-2 md:row-span-2"
             large
+            className="h-[320px] md:h-[480px] md:col-span-2"
           />
 
-          {/* Position 2: Right top card */}
-          <CardOverlay cat={cards['2']} className="" />
-
-          {/* Position 3: Right bottom card */}
-          <CardOverlay cat={cards['3']} className="" />
+          {/* Right column — two stacked cards */}
+          <div className="grid grid-cols-1 gap-gutter">
+            <CardOverlay
+              cat={cards['2']}
+              className="h-[180px] md:h-[220px]"
+            />
+            <CardOverlay
+              cat={cards['3']}
+              className="h-[180px] md:h-[220px]"
+            />
+          </div>
         </div>
       </div>
     </section>

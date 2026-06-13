@@ -133,7 +133,6 @@ export default function Navbar({ activeLink }) {
     }
   };
   const { settings } = useSettingsStore();
-  const whatsappNumber = settings?.whatsapp || settings?.storePhone || "";
 
   const API_URL = process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || 'http://localhost:5000';
   const getImageUrl = (url) => (url ? `${API_URL}${url}` : null);
@@ -172,7 +171,7 @@ export default function Navbar({ activeLink }) {
   }, [searchQuery, handleSearch]);
 
   useEffect(() => {
-    const unsub = scrollY.on("change", (y) => setScrolled(y > 50));
+    const unsub = scrollY.on("change", (y) => setScrolled(false));
     return () => unsub();
   }, [scrollY]);
 
@@ -186,13 +185,14 @@ export default function Navbar({ activeLink }) {
   return (
     <>
       <motion.header
-        className="fixed top-0 left-0 right-0 z-50 transition-shadow duration-300"
-        style={{
-          backgroundColor: scrolled ? "rgba(251,249,244,100)" : "transparent",
-          boxShadow: scrolled ? "0 8px 40px rgba(45,71,57,0.06)" : "none",
-        }}
+        className="fixed top-0 left-0 right-0 z-50 transition-shadow duration-300 bg-background"
       >
-        <div className="flex items-center justify-between h-16 container-main md:h-20">
+        <div className="bg-primary text-on-primary text-center py-2 px-4">
+          <p className="text-xs tracking-wider font-medium">
+            ✨ FREE SHIPPING ON ORDERS ABOVE ₹500 • 40+ YEARS OF HERITAGE WELLNESS ✨
+          </p>
+        </div>
+        <div className="flex items-center justify-between h-16 container-main md:h-16">
           <Link href="/" className="font-display text-[22px] text-charcoal">
             Venus Essentials
           </Link>
@@ -365,8 +365,8 @@ export default function Navbar({ activeLink }) {
                         href={link.href}
                         onClick={() => setMobileOpen(false)}
                         className={`font-body text-base ${isActive(link)
-                            ? "font-medium text-primary-container"
-                            : "text-on-surface-variant"
+                          ? "font-medium text-primary-container"
+                          : "text-on-surface-variant"
                           }`}
                       >
                         {link.label}
@@ -393,7 +393,7 @@ export default function Navbar({ activeLink }) {
             <div className="flex flex-col items-center pt-6 md:pt-12">
               <div className="flex items-center gap-3 mb-6">
                 <span className="text-2xl tracking-wide font-display md:text-3xl text-charcoal">
-                  Venus Ooty Essentials
+                  Venus Essentials
                 </span>
                 <button
                   type="button"
